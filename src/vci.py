@@ -3,14 +3,23 @@ from argparse import ArgumentParser
 import os
 import yaml
 
+from modules import Tapestry
+
+
+MODULES = {
+	'tapestry': Tapestry
+}
+
 
 class VCI():
-	def __init__(self, tool, path=None):
-		self.tool = tool
+	def __init__(self, tool_name, path=None):
 		self.config_name = 'vci.config.yaml'
 		self.config = self.parse_yaml(path)
 
-		print(self.config)
+		self.tool_name = tool_name
+		if self.tool_name not in MODULES:
+			raise Exception(f'No tool named {self.tool_name}')
+		self.tool = MODULES[self.tool_name](self.config)
 
 	def parse_yaml(self, path):
 		if path is None:
@@ -33,10 +42,10 @@ class VCI():
 			return yaml.load(stream, Loader=yaml.Loader)
 
 	def start(self):
-		print(f'Starting {self.tool}')
+		self.tool.start()
 
 	def stop(self):
-		print(f'Stopping {self.tool}')
+		self.tool.stop()
 
 
 if __name__ == '__main__':
@@ -44,7 +53,7 @@ if __name__ == '__main__':
 
 	parser.add_argument(
 		'tool',
-		help='The visualization tool to run (choices: tapestry, tannerlol).',
+		help='The visualization tool to run (choices: tapestry).',
 		metavar='TOOL'
 	)
 	parser.add_argument('-c', '--config', dest='path')
