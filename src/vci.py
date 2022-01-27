@@ -4,28 +4,39 @@ import os
 import yaml
 
 
-CONFIG_FNAME = 'vci.config.yaml'
+class VCI():
+	def __init__(self, tool, path=None):
+		self.tool = tool
+		self.config_name = 'vci.config.yaml'
+		self.config = self.parse_yaml(path)
 
+		print(self.config)
 
-def parse_yaml(path):
-	if path is None:
-		path = os.getcwd()
+	def parse_yaml(self, path):
+		if path is None:
+			path = os.getcwd()
 
-		files = os.listdir(path)
-		while CONFIG_FNAME not in files:
-			path = os.path.abspath(os.path.join(path, '..'))
 			files = os.listdir(path)
+			while self.config_name not in files:
+				path = os.path.abspath(os.path.join(path, '..'))
+				files = os.listdir(path)
 
-			if path == '/':
-				break
+				if path == '/':
+					break
 
-		if CONFIG_FNAME not in files:
-			raise FileNotFoundError(CONFIG_FNAME)
+			if self.config_name not in files:
+				raise FileNotFoundError(self.config_name)
 
-		path = os.path.join(path, CONFIG_FNAME)
+			path = os.path.join(path, self.config_name)
 
-	with open(path, 'r', encoding='utf8') as stream:
-		return yaml.load(stream, Loader=yaml.Loader)
+		with open(path, 'r', encoding='utf8') as stream:
+			return yaml.load(stream, Loader=yaml.Loader)
+
+	def start(self):
+		print(f'Starting {self.tool}')
+
+	def stop(self):
+		print(f'Stopping {self.tool}')
 
 
 if __name__ == '__main__':
@@ -39,7 +50,6 @@ if __name__ == '__main__':
 	parser.add_argument('-c', '--config', dest='path')
 	args = parser.parse_args()
 
-	config = parse_yaml(args.path)
-
-	print(f'Loading {args.tool}')
-	print(f'Config {config}')
+	vci = VCI(args.tool, path=args.path)
+	vci.start()
+	vci.stop()
