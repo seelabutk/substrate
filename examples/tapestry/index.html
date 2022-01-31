@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+	<head>
+		<title>Tapestry</title>
+		<link rel="stylesheet" href="/css/style.css">
+
+		<!-- jQuery dependency -->
+		<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+		<!-- For testing -->
+		<script src="/js/smooth.js"></script>
+		<script src="/js/gremlins.min.js"></script>
+		<script src="/js/testing.js"></script>
+
+		<!-- Core Tapestry JS -->
+		<script src="/js/tools.js"></script>
+		<script src="/js/sylvester.js"></script>
+		<script src="/js/math.js"></script>
+		<script src="/js/arcball.js"></script>
+		<script src="/js/tapestry.js"></script>
+		<script src="/js/main.js"></script>
+
+		<!-- For minified version -->
+		<!-- <script src="js/tapestry.min.js></script> -->
+	</head>
+	<body>
+		<div class="keyframes"></div>
+		<div class="hyperimage" id="turbulence" data-dataset="data" data-isovalues="1"></div>
+
+		<a class="hyperaction" href="#" for="turbulence" data-action="position=-100,10,800">Set camera</a>
+
+		<br>
+		Isosurface threshold
+		<input class="threshold-slider" type="range" min=1 max=30 value="1">
+	</body>
+</html>

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from argparse import ArgumentParser
 import os
+import signal
 import yaml
 
 from docker import from_env
@@ -27,14 +28,12 @@ class VCI():
 
 	def create_swarm(self):
 		self.docker.swarm.init()
-		self.log('Initialized Swarm')
 
 		# TODO: support multiple machines as managers or workers
 		# TODO: support AWS
 
 	def destroy_swarm(self):
 		self.docker.swarm.leave(force=True)
-		self.log('Destroyed Swarm')
 
 	# TODO: use more sophisticated logging setup
 	def log(self, message):
@@ -62,13 +61,15 @@ class VCI():
 
 	def start(self):
 		self.create_swarm()
+		self.log('Initialized Swarm.')
 		self.tool.start()
-		self.log(f'Started {self.tool_name.capitalize()}')
+		self.log(f'Started {self.tool_name.capitalize()}. Press Ctrl+C to exit.')
 
 	def stop(self):
 		self.tool.stop()
-		self.log(f'Stopped {self.tool_name.capitalize()}')
+		self.log(f'Stopped {self.tool_name.capitalize()}.')
 		self.destroy_swarm()
+		self.log('Destroyed Swarm.')
 
 
 if __name__ == '__main__':
@@ -79,13 +80,16 @@ if __name__ == '__main__':
 		help='The visualization tool to run (choices: tapestry).',
 		metavar='TOOL'
 	)
-	parser.add_argument('action', choices=['start', 'stop'])
+	parser.add_argument('-i', '--identity', dest='identity')
 	parser.add_argument('-c', '--config', dest='path')
 	args = parser.parse_args()
 
 	vci = VCI(args.tool, path=args.path)
 
-	if args.action == 'start':
-		vci.start()
-	elif args.action == 'stop':
-		vci.stop()
+	vci.start()
+	signal.sigwait([signal.SIGINT])
+	# TODO: consider scaling the swarm as needed here
+	# scale_interval = vci.config['cluster']['scale_interval']
+	# while signal.sigtimedwait([signal.SIGINT], scale_interval) is None:
+	# 	vci.scale()
+	vci.stop()

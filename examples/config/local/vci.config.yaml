@@ -3,20 +3,25 @@
 
 ### Define the data source
 data:
-  source: https://link-to.your-dataset.netcdf
-  variables:
-    - x
-    - y
-    - z
-  target:
-    path: path/to/place/dataset
-  time-variable: t
+  source: https://link.to/your/dataset.raw
+  dimensions:
+    - 256
+    - 256
+    - 256
+  target: /path/to/store/dataset.raw
+  ### TODO: NetCDF support
+  #variables:
+  #  - x
+  #  - y
+  #  - z
+  #time-variable: t
 
 
 ### Local deployment
 ### Each node should have Docker Engine installed.
 cluster:
-  identity: path/to/ssh/identity/file # TODO: this shouldn't be in a committed file
+  port: 8080
+  scale_interval: 60
   #managers:
   #workers:
 
