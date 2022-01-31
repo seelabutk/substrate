@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+docker = "*"
 PyYAML = "*"
 
 [dev-packages]
@@ -12,4 +13,4 @@ pyflakes = "*"
 pylint = "*"
 
 [requires]
-python_version = "3.10"
+python_version = "3.9"

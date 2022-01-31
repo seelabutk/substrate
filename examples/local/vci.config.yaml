@@ -13,21 +13,12 @@ data:
   time-variable: t
 
 
-### TODO: determine if a timeout setting here would be a good idea/possible
-
-
 ### Local deployment
 ### Each node should have Docker Engine installed.
 cluster:
   identity: path/to/ssh/identity/file # TODO: this shouldn't be in a committed file
-  managers:
-    - IP.of.node.1
-    - IP.of.node.2
-  workers:
-    - IP.of.node.3
-    - IP.of.node.4
-    - IP.of.node.5
-    - IP.of.node.6
+  #managers:
+  #workers:
 
 
 ### TODO: AWS deployment
