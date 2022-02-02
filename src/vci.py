@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 from argparse import ArgumentParser
 import os
+from pathlib import Path
 import signal
-import yaml
 
 from docker import from_env
+import paramiko
+import yaml
 
 from modules import Tapestry
 
@@ -26,13 +28,67 @@ class VCI():
 			raise Exception(f'No tool named {self.tool_name}')
 		self.tool = MODULES[self.tool_name](self.docker, self.config)
 
-	def create_swarm(self):
-		self.docker.swarm.init()
+		ssh_dir = os.path.join(Path.home(), '.ssh')
+		ssh_dirfiles = os.listdir(ssh_dir)
+		ssh_keys = [keyfile for keyfile in ssh_dirfiles if keyfile.startswith('id_')]
+		ssh_pkeys = [keyfile for keyfile in ssh_keys if not keyfile.endswith('.pub')]
+		self.key_paths = [os.path.join(ssh_dir, keyfile) for keyfile in ssh_pkeys]
 
-		# TODO: support multiple machines as managers or workers
+	def create_swarm(self):
+		advertise_addr = self.config['cluster']['advertise_addr']
+		self.docker.swarm.init(advertise_addr=advertise_addr)
+
+		manager_token = self.docker.swarm.attrs['JoinTokens']['Manager']
+		worker_token = self.docker.swarm.attrs['JoinTokens']['Worker']
+
+		nodes = []
+		for node in self.config['cluster']['managers']:
+			nodes.append(('manager', node))
+		for node in self.config['cluster']['workers']:
+			nodes.append(('worker', node))
+
+		for node_type, node in nodes:
+			username, location = node.split('@')
+			if node_type == 'manager':
+				token = manager_token
+			elif node_type == 'worker':
+				token = worker_token
+
+			with paramiko.client.SSHClient() as ssh_client:
+				ssh_client.load_system_host_keys()
+				ssh_client.connect(
+					location,
+					username=username,
+					key_filename=self.key_paths
+				)
+
+				_, _, stderr = ssh_client.exec_command(
+					f'docker swarm join --token {token} {advertise_addr}'
+				)
+				stderr = stderr.read()
+				if stderr:
+					self.log(f'remote error ({location}): {stderr}')
+
 		# TODO: support AWS
 
 	def destroy_swarm(self):
+		for node in self.config['cluster']['managers']:
+			username, location = node.split('@')
+
+			with paramiko.client.SSHClient() as ssh_client:
+				ssh_client = paramiko.client.SSHClient()
+				ssh_client.load_system_host_keys()
+				ssh_client.connect(
+					location,
+					username=username,
+					key_filename=self.key_paths
+				)
+
+				_, _, stderr = ssh_client.exec_command('docker swarm leave --force')
+				stderr = stderr.read()
+				if stderr:
+					self.log(f'remote error ({location}): {stderr}')
+
 		self.docker.swarm.leave(force=True)
 
 	# TODO: use more sophisticated logging setup
@@ -80,7 +136,6 @@ if __name__ == '__main__':
 		help='The visualization tool to run (choices: tapestry).',
 		metavar='TOOL'
 	)
-	parser.add_argument('-i', '--identity', dest='identity')
 	parser.add_argument('-c', '--config', dest='path')
 	args = parser.parse_args()
 
