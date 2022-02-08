@@ -14,7 +14,7 @@ class Tapestry():
 
 		self.service = None
 
-		self.state_path = os.path.join(Path.home(), '.vci')
+		self.state_path = os.path.join(Path.home(), '.substrate')
 		self.config_path = None
 		self.data_path = None
 

@@ -16,11 +16,11 @@ MODULES = {
 }
 
 
-class VCI():
+class Substrate():
 	def __init__(self, tool_name, path=None):
 		self.docker = from_env()
 
-		self.config_name = 'vci.config.yaml'
+		self.config_name = 'substrate.config.yaml'
 		self.config = self.parse_yaml(path)
 
 		self.tool_name = tool_name
@@ -42,10 +42,12 @@ class VCI():
 		worker_token = self.docker.swarm.attrs['JoinTokens']['Worker']
 
 		nodes = []
-		for node in self.config['cluster']['managers']:
-			nodes.append(('manager', node))
-		for node in self.config['cluster']['workers']:
-			nodes.append(('worker', node))
+		if self.config['cluster']['managers']:
+			for node in self.config['cluster']['managers']:
+				nodes.append(('manager', node))
+		if self.config['cluster']['workers']:
+			for node in self.config['cluster']['workers']:
+				nodes.append(('worker', node))
 
 		for node_type, node in nodes:
 			username, location = node.split('@')
@@ -53,6 +55,8 @@ class VCI():
 				token = manager_token
 			elif node_type == 'worker':
 				token = worker_token
+
+			self.log(f'Adding remote {node} to swarm as {node_type}…')
 
 			with paramiko.client.SSHClient() as ssh_client:
 				ssh_client.load_system_host_keys()
@@ -67,13 +71,17 @@ class VCI():
 				)
 				stderr = stderr.read()
 				if stderr:
-					self.log(f'remote error ({location}): {stderr}')
+					self.log(f'✕\nremote error ({location}): {stderr}\n')
+				else:
+					self.log('✓\n')
 
 		# TODO: support AWS
 
 	def destroy_swarm(self):
 		for node in self.config['cluster']['managers']:
 			username, location = node.split('@')
+
+			self.log(f'Removing remote {node} from swarm…')
 
 			with paramiko.client.SSHClient() as ssh_client:
 				ssh_client = paramiko.client.SSHClient()
@@ -87,13 +95,15 @@ class VCI():
 				_, _, stderr = ssh_client.exec_command('docker swarm leave --force')
 				stderr = stderr.read()
 				if stderr:
-					self.log(f'remote error ({location}): {stderr}')
+					self.log(f'✕\nremote error ({location}): {stderr}\n')
+				else:
+					self.log('✓\n')
 
 		self.docker.swarm.leave(force=True)
 
 	# TODO: use more sophisticated logging setup
 	def log(self, message):
-		print(message)
+		print(message, end='')
 
 	def parse_yaml(self, path):
 		if path is None:
@@ -117,19 +127,19 @@ class VCI():
 
 	def start(self):
 		self.create_swarm()
-		self.log('Initialized Swarm.')
+		self.log('Initialized Swarm.\n')
 		self.tool.start()
-		self.log(f'Started {self.tool_name.capitalize()}. Press Ctrl+C to exit.')
+		self.log(f'Started {self.tool_name.capitalize()}. Press Ctrl+C to exit.\n')
 
 	def stop(self):
 		self.tool.stop()
-		self.log(f'Stopped {self.tool_name.capitalize()}.')
+		self.log(f'Stopped {self.tool_name.capitalize()}.\n')
 		self.destroy_swarm()
-		self.log('Destroyed Swarm.')
+		self.log('Destroyed Swarm.\n')
 
 
 if __name__ == '__main__':
-	parser = ArgumentParser(description='Launches a VCI instance')
+	parser = ArgumentParser(description='Launches a Substrate instance')
 
 	parser.add_argument(
 		'tool',
@@ -139,12 +149,12 @@ if __name__ == '__main__':
 	parser.add_argument('-c', '--config', dest='path')
 	args = parser.parse_args()
 
-	vci = VCI(args.tool, path=args.path)
+	substrate = Substrate(args.tool, path=args.path)
 
-	vci.start()
+	substrate.start()
 	signal.sigwait([signal.SIGINT])
 	# TODO: consider scaling the swarm as needed here
-	# scale_interval = vci.config['cluster']['scale_interval']
+	# scale_interval = substrate.config['cluster']['scale_interval']
 	# while signal.sigtimedwait([signal.SIGINT], scale_interval) is None:
-	# 	vci.scale()
-	vci.stop()
+	# 	substrate.scale()
+	substrate.stop()
