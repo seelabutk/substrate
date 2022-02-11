@@ -4,7 +4,7 @@ from pathlib import Path
 from urllib.request import urlretrieve
 from urllib.parse import urlparse
 
-from docker.types.services import EndpointSpec
+from docker.types.services import EndpointSpec, ServiceMode
 
 
 class Tapestry():
@@ -72,11 +72,14 @@ class Tapestry():
 			json.dump(tapestry_config, _file)
 
 	def start(self):
-		# TODO: use replicas
-		port = self.config['cluster']['port']
+		port = self.config['cluster'].get('port', 8080)
 		self.service = self.docker.services.create(
 			'seelabutk/tapestry',
 			endpoint_spec=EndpointSpec(ports={port: (9010, 'tcp')}),
+			mode=ServiceMode(
+				mode='replicated',
+				replicas=self.config['cluster'].get('replicas', 0)
+			),
 			mounts=[
 				f'{os.path.dirname(self.config_path)}:/config:ro',
 				f'{os.path.dirname(self.data_path)}:/data:ro'

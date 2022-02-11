@@ -35,19 +35,17 @@ class Substrate():
 		self.key_paths = [os.path.join(ssh_dir, keyfile) for keyfile in ssh_pkeys]
 
 	def create_swarm(self):
-		advertise_addr = self.config['cluster']['advertise_addr']
+		advertise_addr = self.config['cluster'].get('advertise_addr', '0.0.0.0')
 		self.docker.swarm.init(advertise_addr=advertise_addr)
 
 		manager_token = self.docker.swarm.attrs['JoinTokens']['Manager']
 		worker_token = self.docker.swarm.attrs['JoinTokens']['Worker']
 
 		nodes = []
-		if self.config['cluster']['managers']:
-			for node in self.config['cluster']['managers']:
-				nodes.append(('manager', node))
-		if self.config['cluster']['workers']:
-			for node in self.config['cluster']['workers']:
-				nodes.append(('worker', node))
+		for node in self.config['cluster'].get('managers', []):
+			nodes.append(('manager', node))
+		for node in self.config['cluster'].get('workers', []):
+			nodes.append(('worker', node))
 
 		for node_type, node in nodes:
 			username, location = node.split('@')
@@ -78,7 +76,13 @@ class Substrate():
 		# TODO: support AWS
 
 	def destroy_swarm(self):
-		for node in self.config['cluster']['managers']:
+		nodes = []
+		for node in self.config['cluster'].get('managers', []):
+			nodes.append(node)
+		for node in self.config['cluster'].get('workers', []):
+			nodes.append(node)
+
+		for node in nodes:
 			username, location = node.split('@')
 
 			self.log(f'Removing remote {node} from swarm…')
@@ -153,8 +157,4 @@ if __name__ == '__main__':
 
 	substrate.start()
 	signal.sigwait([signal.SIGINT])
-	# TODO: consider scaling the swarm as needed here
-	# scale_interval = substrate.config['cluster']['scale_interval']
-	# while signal.sigtimedwait([signal.SIGINT], scale_interval) is None:
-	# 	substrate.scale()
 	substrate.stop()

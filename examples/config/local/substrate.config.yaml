@@ -1,5 +1,5 @@
 ### For more information on these options, please visit
-### https://github.com/seelabutk/vci.
+### https://github.com/seelabutk/substrate.
 
 ### Define the data source
 data:
@@ -21,6 +21,7 @@ data:
 ### Each node should have Docker Engine installed.
 cluster:
   port: 8080
+  replicas: 2
   scale_interval: 60
   #managers:
   #workers:
