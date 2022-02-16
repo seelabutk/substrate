@@ -9,11 +9,12 @@ from docker import from_env
 import paramiko
 import yaml
 
-from modules import Tapestry
+from modules import Tapestry, VCI
 
 
 MODULES = {
-	'tapestry': Tapestry
+	'tapestry': Tapestry,
+	'vci': VCI
 }
 
 
