@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 import os
 from pathlib import Path
 import signal
+import sys
 
 from docker import from_env
 import paramiko
@@ -17,16 +18,16 @@ MODULES = {
 
 
 class Substrate():
-	def __init__(self, tool_name, path=None):
+	def __init__(self, cli_args, path=None):
 		self.docker = from_env()
 
 		self.config_name = 'substrate.config.yaml'
 		self.config = self.parse_yaml(path)
 
-		self.tool_name = tool_name
+		self.tool_name = cli_args.tool
 		if self.tool_name not in MODULES:
 			raise Exception(f'No tool named {self.tool_name}')
-		self.tool = MODULES[self.tool_name](self.docker, self.config)
+		self.tool = MODULES[self.tool_name](self.docker, self.config, cli_args)
 
 		ssh_dir = os.path.join(Path.home(), '.ssh')
 		ssh_dirfiles = os.listdir(ssh_dir)
@@ -35,6 +36,9 @@ class Substrate():
 		self.key_paths = [os.path.join(ssh_dir, keyfile) for keyfile in ssh_pkeys]
 
 	def create_swarm(self):
+		# TODO: They really like creating their own overlay networks to use instead
+		# of ingress, and I should contemplate this.
+
 		advertise_addr = self.config['cluster'].get('advertise_addr', '0.0.0.0')
 		self.docker.swarm.init(advertise_addr=advertise_addr)
 
@@ -147,13 +151,17 @@ if __name__ == '__main__':
 
 	parser.add_argument(
 		'tool',
-		help='The visualization tool to run (choices: tapestry).',
+		help='The visualization tool to run (choices: tapestry, vci).',
 		metavar='TOOL'
 	)
 	parser.add_argument('-c', '--config', dest='path')
+	parser.add_argument('--tapestry_dir')
 	args = parser.parse_args()
 
-	substrate = Substrate(args.tool, path=args.path)
+	if args.tool == 'tapestry' and args.tapestry_dir is None:
+		sys.exit('Tapestry requires the --tapestry_dir option to be set.')
+
+	substrate = Substrate(args, path=args.path)
 
 	substrate.start()
 	signal.sigwait([signal.SIGINT])
