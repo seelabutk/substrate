@@ -138,11 +138,11 @@ class Substrate():
 		self.create_swarm()
 		self.log('Initialized Swarm.\n')
 		self.tool.start()
-		self.log(f'Started {self.tool_name.capitalize()}. Press Ctrl+C to exit.\n')
+		self.log(f'Started {self.tool_name}. Press Ctrl+C to exit.\n')
 
 	def stop(self):
 		self.tool.stop()
-		self.log(f'Stopped {self.tool_name.capitalize()}.\n')
+		self.log(f'Stopped {self.tool_name}.\n')
 		self.destroy_swarm()
 		self.log('Destroyed Swarm.\n')
 
