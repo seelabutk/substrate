@@ -28,7 +28,7 @@ class Tapestry():
 			filename = os.path.split(data_file)[1]
 
 			# Set dataset-specific Tapestry configuration
-			tapestry_config['filename'] = filename
+			tapestry_config['filename'] = f'/data/{filename}'
 			tapestry_config['dimensions'] = self.config['tapestry']['dimensions']
 			tapestry_config['cameraPosition'] = [
 				0,
@@ -44,6 +44,8 @@ class Tapestry():
 		port = self.config['cluster'].get('port', 8080)
 		self.service = self.docker.services.create(
 			'evilkermit/substrate_tapestry:latest',
+			'./server',
+			args=['/config', '9010', '/app'],
 			endpoint_spec=EndpointSpec(ports={port: (9010, 'tcp')}),
 			env=['APP_DIR=/app'],
 			mode=ServiceMode(
