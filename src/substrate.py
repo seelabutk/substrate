@@ -3,7 +3,8 @@ from argparse import ArgumentParser
 import os
 from pathlib import Path
 import signal
-import sys
+from urllib.request import urlretrieve
+from urllib.parse import urlparse
 
 from docker import from_env
 import paramiko
@@ -19,16 +20,19 @@ MODULES = {
 
 
 class Substrate():
-	def __init__(self, cli_args, path=None):
+	def __init__(self, tool_name, path=None):
 		self.docker = from_env()
+		self.network = None
 
 		self.config_name = 'substrate.config.yaml'
 		self.config = self.parse_yaml(path)
 
-		self.tool_name = cli_args.tool
+		data_path = self.get_data()
+
+		self.tool_name = tool_name
 		if self.tool_name not in MODULES:
 			raise Exception(f'No tool named {self.tool_name}')
-		self.tool = MODULES[self.tool_name](self.docker, self.config, cli_args)
+		self.tool = MODULES[self.tool_name](self.docker, self.config, data_path)
 
 		ssh_dir = os.path.join(Path.home(), '.ssh')
 		ssh_dirfiles = os.listdir(ssh_dir)
@@ -37,11 +41,13 @@ class Substrate():
 		self.key_paths = [os.path.join(ssh_dir, keyfile) for keyfile in ssh_pkeys]
 
 	def create_swarm(self):
-		# TODO: They really like creating their own overlay networks to use instead
-		# of ingress, and I should contemplate this.
-
 		advertise_addr = self.config['cluster'].get('advertise_addr', '0.0.0.0')
 		self.docker.swarm.init(advertise_addr=advertise_addr)
+
+		self.network = self.docker.networks.create(
+			f'substrate-{self.tool_name}-net',
+			driver='overlay'
+		)
 
 		manager_token = self.docker.swarm.attrs['JoinTokens']['Manager']
 		worker_token = self.docker.swarm.attrs['JoinTokens']['Worker']
@@ -110,6 +116,25 @@ class Substrate():
 
 		self.docker.swarm.leave(force=True)
 
+	def get_data(self):
+		source_path = self.config['data']['source']
+
+		# Download the dataset if necessary to the target location
+		if urlparse(source_path).scheme != '':
+			target_path = os.path.abspath(self.config['data']['target'])
+
+			os.makedirs(os.path.dirname(target_path), exist_ok=True)
+			urlretrieve(source_path, target_path)
+
+			data_path = target_path
+		else:
+			data_path = os.path.abspath(source_path)
+
+		if os.path.isfile(data_path):
+			data_path = os.path.dirname(data_path)
+
+		return data_path
+
 	# TODO: use more sophisticated logging setup
 	def log(self, message):
 		print(message, end='')
@@ -138,11 +163,11 @@ class Substrate():
 		self.create_swarm()
 		self.log('Initialized Swarm.\n')
 		self.tool.start()
-		self.log(f'Started {self.tool_name.capitalize()}. Press Ctrl+C to exit.\n')
+		self.log(f'Started {self.tool_name}. Press Ctrl+C to exit.\n')
 
 	def stop(self):
 		self.tool.stop()
-		self.log(f'Stopped {self.tool_name.capitalize()}.\n')
+		self.log(f'Stopped {self.tool_name}.\n')
 		self.destroy_swarm()
 		self.log('Destroyed Swarm.\n')
 
@@ -156,13 +181,9 @@ if __name__ == '__main__':
 		metavar='TOOL'
 	)
 	parser.add_argument('-c', '--config', dest='path')
-	parser.add_argument('--tapestry_dir')
 	args = parser.parse_args()
 
-	if args.tool == 'tapestry' and args.tapestry_dir is None:
-		sys.exit('Tapestry requires the --tapestry_dir option to be set.')
-
-	substrate = Substrate(args, path=args.path)
+	substrate = Substrate(args.tool, path=args.path)
 
 	substrate.start()
 	signal.sigwait([signal.SIGINT])

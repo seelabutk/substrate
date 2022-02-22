@@ -9,7 +9,6 @@ data:
     - 256
     - 256
   target: /path/to/store/dataset.raw
-  ### TODO: NetCDF support
   #variables:
   #  - x
   #  - y
@@ -25,7 +24,3 @@ cluster:
   scale_interval: 60
   #managers:
   #workers:
-
-
-### TODO: AWS deployment
-### TODO: Terraform deployment (maybe)
