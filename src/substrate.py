@@ -18,17 +18,17 @@ MODULES = {
 
 
 class Substrate():
-	def __init__(self, cli_args, path=None):
+	def __init__(self, tool_name, path=None):
 		self.docker = from_env()
 		self.network = None
 
 		self.config_name = 'substrate.config.yaml'
 		self.config = self.parse_yaml(path)
 
-		self.tool_name = cli_args.tool
+		self.tool_name = tool_name
 		if self.tool_name not in MODULES:
 			raise Exception(f'No tool named {self.tool_name}')
-		self.tool = MODULES[self.tool_name](self.docker, self.config, cli_args)
+		self.tool = MODULES[self.tool_name](self.docker, self.config)
 
 		ssh_dir = os.path.join(Path.home(), '.ssh')
 		ssh_dirfiles = os.listdir(ssh_dir)
@@ -158,11 +158,9 @@ if __name__ == '__main__':
 		metavar='TOOL'
 	)
 	parser.add_argument('-c', '--config', dest='path')
-	parser.add_argument('--tapestry_dir')
-	parser.add_argument('--vci_dir')
 	args = parser.parse_args()
 
-	substrate = Substrate(args, path=args.path)
+	substrate = Substrate(args.tool, path=args.path)
 
 	substrate.start()
 	signal.sigwait([signal.SIGINT])

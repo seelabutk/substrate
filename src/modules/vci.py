@@ -4,14 +4,13 @@ from docker.types.services import EndpointSpec, ServiceMode
 
 
 class VCI():
-	def __init__(self, docker, config, args):
+	def __init__(self, docker, config):
 		self.docker = docker
 		self.config = config
 
 		self.service = None
 
-		# TODO: provide a default "good" directory if none is set
-		self.vci_path = args.vci_dir
+		self.vci_path = self.config['vci']['directory']
 		self.data_path = None
 
 		self.vci_pattern = ''
@@ -24,8 +23,7 @@ class VCI():
 		# TODO: use a downloadable dataset
 		self.data_path = os.path.abspath(source_path)
 
-		# TODO: get this from self.data_path or self.vci_path
-		self.vci_pattern = 'UGRD-1yr-720x361-fcst0-*of*_*of*_*of*_*of*.dat'
+		self.vci_pattern = self.config['vci']['file_pattern']
 
 	def start(self):
 		port = self.config['cluster'].get('port', 8080)
@@ -44,8 +42,7 @@ class VCI():
 			),
 			mounts=[
 				f'{self.data_path}:/data:ro',
-				f'{self.vci_path}:/opt/run:ro',
-				'/etc/hosts:/etc/hosts:ro'
+				f'{self.vci_path}:/opt/run:ro'
 			],
 			name='VCI',
 			workdir='/opt/run'

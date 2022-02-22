@@ -8,14 +8,13 @@ from docker.types.services import EndpointSpec, ServiceMode
 
 
 class Tapestry():
-	def __init__(self, docker, config, args):
+	def __init__(self, docker, config):
 		self.docker = docker
 		self.config = config
 
 		self.service = None
 
-		# TODO: provide a default "good" directory if none is set
-		self.tapestry_path = args.tapestry_dir
+		self.tapestry_path = self.config['tapestry']['directory']
 		self.app_path = os.path.join(self.tapestry_path, 'app')
 		self.config_path = os.path.join(self.tapestry_path, 'config')
 		self.data_path = None
