@@ -14,6 +14,7 @@ class Tapestry():
 
 		self.service = None
 
+		# TODO: provide a default "good" directory if none is set
 		self.tapestry_path = args.tapestry_dir
 		self.app_path = os.path.join(self.tapestry_path, 'app')
 		self.config_path = os.path.join(self.tapestry_path, 'config')
@@ -57,7 +58,7 @@ class Tapestry():
 	def start(self):
 		port = self.config['cluster'].get('port', 8080)
 		self.service = self.docker.services.create(
-			'evilkermit/substrate_tapestry',
+			'evilkermit/substrate_tapestry:latest',
 			endpoint_spec=EndpointSpec(ports={port: (9010, 'tcp')}),
 			env=['APP_DIR=/app'],
 			mode=ServiceMode(

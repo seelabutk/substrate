@@ -3,7 +3,6 @@ from argparse import ArgumentParser
 import os
 from pathlib import Path
 import signal
-import sys
 
 from docker import from_env
 import paramiko
@@ -21,6 +20,7 @@ MODULES = {
 class Substrate():
 	def __init__(self, cli_args, path=None):
 		self.docker = from_env()
+		self.network = None
 
 		self.config_name = 'substrate.config.yaml'
 		self.config = self.parse_yaml(path)
@@ -37,11 +37,13 @@ class Substrate():
 		self.key_paths = [os.path.join(ssh_dir, keyfile) for keyfile in ssh_pkeys]
 
 	def create_swarm(self):
-		# TODO: They really like creating their own overlay networks to use instead
-		# of ingress, and I should contemplate this.
-
 		advertise_addr = self.config['cluster'].get('advertise_addr', '0.0.0.0')
 		self.docker.swarm.init(advertise_addr=advertise_addr)
+
+		self.network = self.docker.networks.create(
+			f'substrate-{self.tool_name}-net',
+			driver='overlay'
+		)
 
 		manager_token = self.docker.swarm.attrs['JoinTokens']['Manager']
 		worker_token = self.docker.swarm.attrs['JoinTokens']['Worker']
@@ -157,10 +159,8 @@ if __name__ == '__main__':
 	)
 	parser.add_argument('-c', '--config', dest='path')
 	parser.add_argument('--tapestry_dir')
+	parser.add_argument('--vci_dir')
 	args = parser.parse_args()
-
-	if args.tool == 'tapestry' and args.tapestry_dir is None:
-		sys.exit('Tapestry requires the --tapestry_dir option to be set.')
 
 	substrate = Substrate(args, path=args.path)
 
