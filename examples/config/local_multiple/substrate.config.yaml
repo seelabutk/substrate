@@ -9,7 +9,6 @@ data:
     - 256
     - 256
   #target:
-  ### TODO: NetCDF support
   #variables:
   #  - x
   #  - y
@@ -31,7 +30,3 @@ cluster:
     - ssh_username@worker1.ip.address.here
     - ssh_username@worker2.ip.address.here
     - ssh_username@worker3.ip.address.here
-
-
-### TODO: AWS deployment
-### TODO: Terraform deployment (maybe)
