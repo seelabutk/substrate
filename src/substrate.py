@@ -3,6 +3,8 @@ from argparse import ArgumentParser
 import os
 from pathlib import Path
 import signal
+from urllib.request import urlretrieve
+from urllib.parse import urlparse
 
 from docker import from_env
 import paramiko
@@ -25,10 +27,12 @@ class Substrate():
 		self.config_name = 'substrate.config.yaml'
 		self.config = self.parse_yaml(path)
 
+		data_path = self.get_data()
+
 		self.tool_name = tool_name
 		if self.tool_name not in MODULES:
 			raise Exception(f'No tool named {self.tool_name}')
-		self.tool = MODULES[self.tool_name](self.docker, self.config)
+		self.tool = MODULES[self.tool_name](self.docker, self.config, data_path)
 
 		ssh_dir = os.path.join(Path.home(), '.ssh')
 		ssh_dirfiles = os.listdir(ssh_dir)
@@ -111,6 +115,25 @@ class Substrate():
 					self.log('✓\n')
 
 		self.docker.swarm.leave(force=True)
+
+	def get_data(self):
+		source_path = self.config['data']['source']
+
+		# Download the dataset if necessary to the target location
+		if urlparse(source_path).scheme != '':
+			target_path = os.path.abspath(self.config['data']['target'])
+
+			os.makedirs(os.path.dirname(target_path), exist_ok=True)
+			urlretrieve(source_path, target_path)
+
+			data_path = target_path
+		else:
+			data_path = os.path.abspath(source_path)
+
+		if os.path.isfile(data_path):
+			data_path = os.path.dirname(data_path)
+
+		return data_path
 
 	# TODO: use more sophisticated logging setup
 	def log(self, message):

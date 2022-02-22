@@ -1,27 +1,15 @@
-import os
-
 from docker.types.services import EndpointSpec, ServiceMode
 
 
 class VCI():
-	def __init__(self, docker, config):
+	def __init__(self, docker, config, data_path):
 		self.docker = docker
 		self.config = config
 
 		self.service = None
 
 		self.vci_path = self.config['vci']['directory']
-		self.data_path = None
-
-		self.vci_pattern = ''
-
-		self.get_data()
-
-	def get_data(self):
-		source_path = self.config['data']['source']
-
-		# TODO: use a downloadable dataset
-		self.data_path = os.path.abspath(source_path)
+		self.data_path = data_path
 
 		self.vci_pattern = self.config['vci']['file_pattern']
 
@@ -38,13 +26,14 @@ class VCI():
 			],
 			mode=ServiceMode(
 				mode='replicated',
-				replicas=self.config['cluster'].get('replicas', 0)
+				replicas=self.config['cluster'].get('replicas', 1)
 			),
 			mounts=[
 				f'{self.data_path}:/data:ro',
 				f'{self.vci_path}:/opt/run:ro'
 			],
 			name='VCI',
+			networks=['substrate-vci-net'],
 			workdir='/opt/run'
 		)
 
