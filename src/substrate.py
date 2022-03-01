@@ -4,7 +4,7 @@ import os
 import subprocess
 import sys
 
-from aws_cdk import App
+from aws_cdk.core import App
 import yaml
 
 from classes import SubstrateStack, SubstrateSwarm
