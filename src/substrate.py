@@ -3,24 +3,38 @@ from argparse import ArgumentParser
 import os
 import subprocess
 import sys
+from urllib.request import urlretrieve
+from urllib.parse import urlparse
 
 from aws_cdk.core import App
 import yaml
 
 from classes import SubstrateStack, SubstrateSwarm
+from classes.tools import Tapestry, VCI
+
+MODULES = {
+	'tapestry': Tapestry,
+	'vci': VCI
+}
 
 
 class Substrate():
 	def __init__(self, _args):
 		path, config = self.parse_yaml(_args.path)
 
+		data_path = self.get_data(config)
+
+		tool_name = _args.tool
+		if tool_name not in MODULES:
+			raise Exception(f'No tool named {tool_name}')
+		tool = MODULES[tool_name](config, data_path)
+
 		if config.get('aws', None):
 			file_path = os.path.realpath(__file__)
-			os.chdir(os.path.dirname(file_path))
 
 			if _args.action == 'synth':
 				app = App()
-				SubstrateStack(app, 'substrate-stack', config=config)
+				SubstrateStack(app, 'substrate-stack', tool, config)
 				app.synth()
 			if _args.action == 'start':
 				subprocess.run([
@@ -28,7 +42,7 @@ class Substrate():
 					'cdk',
 					'deploy',
 					'--app',
-					f'"python {file_path} {_args.tool} synth -c {path}"'
+					f'"python {file_path} {tool_name} synth -c {path}"'
 				], check=True)
 			if _args.action == 'stop':
 				subprocess.run([
@@ -36,16 +50,42 @@ class Substrate():
 					'cdk',
 					'destroy',
 					'--app',
-					f'"python {file_path} {_args.tool} synth -c {path}"'
+					f'"python {file_path} {tool_name} synth -c {path}"'
+				], check=True)
+				subprocess.run([
+					'aws',
+					's3',
+					'rm',
+					f's3://{config["aws"]["bucket"]}',
+					'--recursive'
 				], check=True)
 
 		elif config.get('cluster', None):
-			substrate = SubstrateSwarm(_args.tool, config)
+			substrate = SubstrateSwarm(tool, config)
 
 			if _args.action == 'start':
 				substrate.start()
 			if _args.action == 'stop':
 				substrate.stop()
+
+	def get_data(self, config):
+		source_path = config['data']['source']
+
+		# Download the dataset if necessary to the target location
+		if urlparse(source_path).scheme != '':
+			target_path = os.path.abspath(config['data']['target'])
+
+			os.makedirs(os.path.dirname(target_path), exist_ok=True)
+			urlretrieve(source_path, target_path)
+
+			data_path = target_path
+		else:
+			data_path = os.path.abspath(source_path)
+
+		if os.path.isfile(data_path):
+			data_path = os.path.dirname(data_path)
+
+		return data_path
 
 	def parse_yaml(self, path):
 		config_name = 'substrate.config.yaml'
