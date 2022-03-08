@@ -4,6 +4,10 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+'aws-cdk.core' = "~=1.147.0"
+'aws-cdk.aws-ec2' = "~=1.147.0"
+'aws-cdk.aws-efs' = "~=1.147.0"
+'aws-cdk.aws-iam' = "~=1.147.0"
 docker = "*"
 paramiko = "*"
 PyYAML = "*"
@@ -14,4 +18,4 @@ pyflakes = "*"
 pylint = "*"
 
 [requires]
-python_version = "3.9"
+python_version = "3.8"
