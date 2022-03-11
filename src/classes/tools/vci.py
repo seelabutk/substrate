@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 from docker import from_env
@@ -10,18 +11,18 @@ class VCI(Tool):
 	def __init__(self, config, data_path):
 		super().__init__(config, data_path)
 
+		self.name = 'vci'
 		self.config = config
 
 		self.vci_pattern = self.config['vci']['file_pattern']
 
-		self.service = None
 		self.service_command = (
 			'docker service create '
 			f'--env VCI_PATTERN={self.vci_pattern} '
 			'--env VCI_ROOT=/data '
 			'--name tapestry '
 			'--publish 80:8840/tcp '
-			f'--replicas {self.config["aws"].get("replicas", 1)} '
+			f'--replicas {self.config.get("aws", {}).get("replicas", 1)} '
 			'--mount type=bind,src=/mnt/efs/data,dst=/data '
 			'--mount type=bind,src=/mnt/efs/app,dst=/opt/run '
 			'-w /opt/run'
@@ -29,14 +30,16 @@ class VCI(Tool):
 			'python3.7 -u -m vci'
 		)
 
-		self.vci_path = self.config['vci']['directory']
+		fallback_dir = os.path.join(__file__, '../../../vci')
+
+		self.vci_path = self.config['vci'].get('directory', fallback_dir)
 		self.data_path = data_path
 
 	def start(self):
 		docker = from_env()
 
 		port = self.config['cluster'].get('port', 8080)
-		self.service = docker.services.create(
+		docker.services.create(
 			'evilkermit/substrate_vci:latest',
 			'python3.7',
 			args=['-u', '-m', 'vci'],
@@ -57,9 +60,6 @@ class VCI(Tool):
 			networks=['substrate-vci-net'],
 			workdir='/opt/run'
 		)
-
-	def stop(self):
-		self.service.remove()
 
 	def upload_to_s3(self):
 		subprocess.run([

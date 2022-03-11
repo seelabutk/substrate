@@ -1,0 +1,10 @@
+{
+    "filename" : "",
+    "dimensions" : [],
+    "imageSize" : [512, 512],
+    "outputImageFilename" : "/mnt/data/image.png",
+    "colorMap" : "Greys",
+    "backgroundColor" : [27, 27, 27],
+    "cameraPosition" : [],
+    "opacityAttenuation": 0.20
+}

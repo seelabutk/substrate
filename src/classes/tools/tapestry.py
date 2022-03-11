@@ -14,15 +14,15 @@ class Tapestry(Tool):
 	def __init__(self, config, data_path):
 		super().__init__(config, data_path)
 
+		self.name = 'tapestry'
 		self.config = config
 
-		self.service = None
 		self.service_command = (
 			'docker service create '
 			'--env APP_DIR=/app '
 			'--name tapestry '
 			'--publish 80:9010/tcp '
-			f'--replicas {self.config["aws"].get("replicas", 1)} '
+			f'--replicas {self.config.get("aws", {}).get("replicas", 1)} '
 			'--mount type=bind,src=/mnt/efs/app,dst=/app '
 			'--mount type=bind,src=/mnt/efs/config,dst=/config '
 			'--mount type=bind,src=/mnt/efs/data,dst=/data '
@@ -30,7 +30,9 @@ class Tapestry(Tool):
 			'./server /config 9010 /app'
 		)
 
-		self.tapestry_path = self.config['tapestry']['directory']
+		fallback_dir = os.path.join(__file__, '../../../tapestry')
+
+		self.tapestry_path = self.config['tapestry'].get('directory', fallback_dir)
 		self.app_path = os.path.join(self.tapestry_path, 'app')
 		self.config_path = os.path.join(self.tapestry_path, 'config')
 		self.data_path = data_path
@@ -64,7 +66,7 @@ class Tapestry(Tool):
 		docker = from_env()
 
 		port = self.config['cluster'].get('port', 8080)
-		self.service = docker.services.create(
+		docker.services.create(
 			'evilkermit/substrate_tapestry:latest',
 			'./server',
 			args=['/config', '9010', '/app'],
@@ -82,9 +84,6 @@ class Tapestry(Tool):
 			name='tapestry',
 			networks=['substrate-tapestry-net']
 		)
-
-	def stop(self):
-		self.service.remove()
 
 	def upload_to_s3(self):
 		subprocess.run([

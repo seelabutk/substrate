@@ -20,11 +20,13 @@ class SubstrateSwarm():
 		self.key_paths = [os.path.join(ssh_dir, keyfile) for keyfile in ssh_pkeys]
 
 	def create_swarm(self):
+		self.log('Initializing the swarm…')
 		advertise_addr = self.config['cluster'].get('advertise_addr', None)
 		if advertise_addr:
 			self.docker.swarm.init(advertise_addr=advertise_addr)
 		else:
 			self.docker.swarm.init()
+		self.log('✓\n')
 
 		self.network = self.docker.networks.create(
 			f'substrate-{self.tool.name}-net',
@@ -66,7 +68,9 @@ class SubstrateSwarm():
 				else:
 					self.log('✓\n')
 
+		self.log('Creating the swarm service…')
 		self.tool.start()
+		self.log('✓\n')
 
 	def destroy_swarm(self):
 		nodes = []
@@ -96,9 +100,10 @@ class SubstrateSwarm():
 				else:
 					self.log('✓\n')
 
+		self.log('Destroying the swarm…')
 		self.docker.swarm.leave(force=True)
+		self.log('✓\n')
 
-	# TODO: use more sophisticated logging setup
 	def log(self, message):
 		print(message, end='')
 
