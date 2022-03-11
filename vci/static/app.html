@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+    <head>
+        <link rel="shortcut icon" href="#">
+        <title>Data streaming test</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body{
+                background-color: white;
+            }
+        </style>
+        <!-- Load THREE.js -->
+        <script src="https://unpkg.com/three@0.110.0/build/three.min.js">/*THREEJS*/</script>
+        <script src="https://unpkg.com/three@0.110.0/examples/js/controls/OrbitControls.js">/*THREEJS orbit controls*/</script>
+        <script src="https://unpkg.com/three@0.110.0/examples/js/libs/dat.gui.min.js">/*dat.gui*/</script>
+        <script src="/static/js/vci.js"></script>
+        <script src="/static/js/app.js" type="module"></script>
+
+        <script>
+            //THREE stats.js fps counter
+            //(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
+        </script>
+    </head>
+    <body>
+        <vci-viewer></vci-viewer>
+    </body>
+</html>

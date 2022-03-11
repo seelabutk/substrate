@@ -1,14 +1,13 @@
 class Tool():
 	def __init__(self, config, data_path):  # pylint: disable=unused-argument
+		# Provide a name for this tool
+		self.name = ''
+
 		# Define the Docker CLI command to create this service on AWS.
 		self.service_command = ''
 
 	# Start a local Docker swarm service
 	def start(self):
-		pass
-
-	# Stop the service created by Tool.start().
-	def stop(self):
 		pass
 
 	# Upload files needed to run your service to S3.

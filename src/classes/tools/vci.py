@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 from docker import from_env
@@ -29,7 +30,9 @@ class VCI(Tool):
 			'python3.7 -u -m vci'
 		)
 
-		self.vci_path = self.config['vci']['directory']
+		fallback_dir = os.path.join(__file__, '../../../vci')
+
+		self.vci_path = self.config['vci'].get('directory', fallback_dir)
 		self.data_path = data_path
 
 	def start(self):
