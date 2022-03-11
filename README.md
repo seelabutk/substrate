@@ -52,7 +52,7 @@ Substrate is configured using substrate.config.yaml. The tool will look for this
 
 or
 
-	stack = Substrate('tool_name', config='path/to/substrate.config.yaml')
+	stack = Substrate('tool_name', path='path/to/substrate.config.yaml')
 
 ### Options
 

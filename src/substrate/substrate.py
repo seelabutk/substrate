@@ -9,8 +9,8 @@ from urllib.parse import urlparse
 from aws_cdk.core import App
 import yaml
 
-from classes import SubstrateStack, SubstrateSwarm
-from classes.tools import Tapestry, VCI
+from .classes import SubstrateStack, SubstrateSwarm
+from .classes.tools import Tapestry, VCI
 
 MODULES = {
 	'tapestry': Tapestry,
@@ -122,7 +122,7 @@ class Substrate():
 			swarm.stop()
 
 
-if __name__ == '__main__':
+def main():
 	parser = ArgumentParser(description='Launches a Substrate instance')
 
 	parser.add_argument(
@@ -146,3 +146,7 @@ if __name__ == '__main__':
 		substrate.start()
 	if args.action == 'stop':
 		substrate.stop()
+
+
+if __name__ == '__main__':
+	main()
