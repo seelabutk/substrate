@@ -19,56 +19,25 @@ MODULES = {
 
 
 class Substrate():
-	def __init__(self, _args):
-		path, config = self.parse_yaml(_args.path)
+	def __init__(self, tool_name, path=None):
+		self.tool_name = tool_name
+		self.path, self.config = self._parse_yaml(path)
 
-		data_path = self.get_data(config)
+		data_path = self._get_data(self.config)
 
-		tool_name = _args.tool
 		if tool_name not in MODULES:
 			raise Exception(f'No tool named {tool_name}')
-		tool = MODULES[tool_name](config, data_path)
+		self.tool = MODULES[tool_name](self.config, data_path)
 
-		if config.get('aws', None):
-			file_path = os.path.realpath(__file__)
+		self.is_aws = self.config.get('aws', None) is not None
+		self.is_local = self.config.get('cluster', None) is not None
 
-			if _args.action == 'synth':
-				app = App()
-				SubstrateStack(app, 'substrate-stack', tool, config)
-				app.synth()
-			if _args.action == 'start':
-				subprocess.run([
-					'npx',
-					'cdk',
-					'deploy',
-					'--app',
-					f'"python {file_path} {tool_name} synth -c {path}"'
-				], check=True)
-			if _args.action == 'stop':
-				subprocess.run([
-					'npx',
-					'cdk',
-					'destroy',
-					'--app',
-					f'"python {file_path} {tool_name} synth -c {path}"'
-				], check=True)
-				subprocess.run([
-					'aws',
-					's3',
-					'rm',
-					f's3://{config["aws"]["bucket"]}',
-					'--recursive'
-				], check=True)
+		if self.is_aws:
+			app = App()
+			SubstrateStack(app, 'substrate-stack', self.tool, self.config)
+			app.synth()
 
-		elif config.get('cluster', None):
-			substrate = SubstrateSwarm(tool, config)
-
-			if _args.action == 'start':
-				substrate.start()
-			if _args.action == 'stop':
-				substrate.stop()
-
-	def get_data(self, config):
+	def _get_data(self, config):
 		source_path = config['data']['source']
 
 		# Download the dataset if necessary to the target location
@@ -87,7 +56,7 @@ class Substrate():
 
 		return data_path
 
-	def parse_yaml(self, path):
+	def _parse_yaml(self, path):
 		config_name = 'substrate.config.yaml'
 
 		if path is None:
@@ -115,6 +84,43 @@ class Substrate():
 
 		return (path, _config)
 
+	def start(self):
+		if self.is_aws:
+			file_path = os.path.realpath(__file__)
+
+			subprocess.run([
+				'npx',
+				'cdk',
+				'deploy',
+				'--app',
+				f'"python {file_path} {self.tool_name} synth -c {self.path}"'
+			], check=True)
+		elif self.is_local:
+			swarm = SubstrateSwarm(self.tool, self.config)
+			swarm.start()
+
+	def stop(self):
+		if self.is_aws:
+			file_path = os.path.realpath(__file__)
+
+			subprocess.run([
+				'npx',
+				'cdk',
+				'destroy',
+				'--app',
+				f'"python {file_path} {self.tool_name} synth -c {self.path}"'
+			], check=True)
+			subprocess.run([
+				'aws',
+				's3',
+				'rm',
+				f's3://{self.config["aws"]["bucket"]}',
+				'--recursive'
+			], check=True)
+		elif self.is_local:
+			swarm = SubstrateSwarm(self.tool, self.config)
+			swarm.stop()
+
 
 if __name__ == '__main__':
 	parser = ArgumentParser(description='Launches a Substrate instance')
@@ -135,4 +141,8 @@ if __name__ == '__main__':
 	if args.action not in ['start', 'stop', 'synth']:
 		sys.exit('Invalid action specified.')
 
-	Substrate(args)
+	substrate = Substrate(args.tool, args.path)
+	if args.action == 'start':
+		substrate.start()
+	if args.action == 'stop':
+		substrate.stop()
