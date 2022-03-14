@@ -30,7 +30,7 @@ class Tapestry(Tool):
 			'./server /config 9010 /app'
 		)
 
-		fallback_dir = os.path.join(__file__, '../../../tapestry')
+		fallback_dir = os.path.join(os.path.dirname(__file__), '../../tapestry')
 
 		self.tapestry_path = self.config['tapestry'].get('directory', fallback_dir)
 		self.app_path = os.path.join(self.tapestry_path, 'app')

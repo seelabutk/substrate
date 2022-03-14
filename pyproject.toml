@@ -1,0 +1,14 @@
+[project]
+dependencies = [
+	'aws-cdk.core ~= 1.147.0',
+	'aws-cdk.aws-ec2 ~= 1.147.0',
+	'aws-cdk.aws-efs ~= 1.147.0',
+	'aws-cdk.aws-iam ~= 1.147.0',
+	'docker ~= 5.0.3',
+	'paramiko ~= 2.9.2',
+	'PyYAML ~= 6.0'
+]
+
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"

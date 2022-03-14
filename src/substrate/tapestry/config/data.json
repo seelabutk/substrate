@@ -1,6 +1,6 @@
 {
     "filename" : "",
-    "dimensions" : [],
+    "dimensions" : [0, 0, 0],
     "imageSize" : [512, 512],
     "outputImageFilename" : "/mnt/data/image.png",
     "colorMap" : "Greys",
