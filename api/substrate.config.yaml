@@ -1,0 +1,41 @@
+### Define the data source
+data: REQUIRED - a local path or URL pointing to the data to use
+
+
+### Local deployment
+### Each node should have Docker Engine installed.
+cluster:
+  port: OPTIONAL - the port to be expose the Docker service on
+  replicas: OPTIONAL - the number of replicas the Docker swarm should use
+  advertise_addr: REQUIRED if using multiple local nodes - the IP:PORT to use to add nodes to the swarm
+  managers: OPTIONAL - Addresses of nodes that should be added to the swarm as managers
+    - manager2.com
+    - ip.of.manager.3
+  workers: OPTIONAL - Addresses of nodes that should be added to the swarm as workers
+    - ip.of.worker.1
+    - worker2.ai
+    - ip.of.worker.3
+
+
+### AWS deployment
+aws:
+  ami: REQUIRED if you don't have access to SSM - the ID of the Amazon Machine Image to use
+  region: REQUIRED - the region to deploy to
+  replicas: OPTIONAL - the number of replicas the Docker swarm should use
+  role_arn: REQUIRED if you don't have access to create IAM roles - the role ARN of the IAM role you want to use to deploy
+  managers: REQUIRED - list of the type and count of EC2 instances to use as managers
+    't3.micro': 1
+  workers: OPTIONAL - list of the type and count of EC2 instances to use as workers
+    't3.micro': 3
+
+### Tool settings
+tapestry:
+  dimensions: REQUIRED - a list of the x, y, and z dimensions of the volume to be rendered
+    - 256
+    - 256
+    - 256
+  directory: OPTIONAL - directory containing files needed for Tapestry to run
+
+vci:
+  directory: OPTIONAL - directory containing files needed for VCI to run
+  file_pattern: REQUIRED - a file pattern that describes all of the data files
