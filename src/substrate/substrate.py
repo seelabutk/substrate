@@ -146,7 +146,3 @@ def main():
 		substrate.start()
 	if args.action == 'stop':
 		substrate.stop()
-
-
-if __name__ == '__main__':
-	main()
