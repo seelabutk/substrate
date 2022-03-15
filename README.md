@@ -46,7 +46,7 @@ Valid tool names:
 
 ### Configuration
 
-Substrate is configured using substrate.config.yaml. The tool will look for this file starting in your current working directory then look for it in parent folders. You can also provide a path with
+Substrate is configured using `substrate.config.yaml`. The tool will look for this file starting in your current working directory then look for it in parent folders. You can also provide a path with
 
 	substrate tapestry start -c /path/to/substrate.config.yaml
 
@@ -54,6 +54,10 @@ or
 
 	stack = Substrate('tool_name', path='path/to/substrate.config.yaml')
 
-### Options
+The options for the configuration file can be found [here](api/substrate.config.yaml).
 
-Describe the configuration options here.
+Each tool has static files that are needed to run it. Defaults are provided, but if needed or desired they can be modified. Here are links to get the default files for [Tapestry](src/substrate/tapestry) and [VCI](src/substrate/vci).
+
+For more information on configuring each tool, please refer to each tools documentation:
+- [Tapestry](https://github.com/seelabutk/tapestry)
+- [VCI](https://bitbucket.org/seelabutk/vci)
