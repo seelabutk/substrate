@@ -1,5 +1,10 @@
 ### Define the data source
-data: REQUIRED - a local path or URL pointing to the data to use
+data:
+  source: REQUIRED - a list of paths or URLs pointing to the data to use
+    - /path/to/data
+    - /path/to/data/dataset.dat
+    - https://data.com/dataset.dat
+  target: REQUIRED if using a local deployment and a URL data source - where to place the downloaded data on the local file system
 
 
 ### Local deployment
@@ -35,6 +40,7 @@ tapestry:
     - 256
     - 256
   directory: OPTIONAL - directory containing files needed for Tapestry to run
+  filename: REQUIRED - the filename of the data file to be rendered
 
 vci:
   directory: OPTIONAL - directory containing files needed for VCI to run

@@ -11,8 +11,8 @@ from . import Tool
 
 
 class Tapestry(Tool):
-	def __init__(self, config, data_path):
-		super().__init__(config, data_path)
+	def __init__(self, config, data_sources):
+		super().__init__(config, data_sources)
 
 		self.name = 'tapestry'
 		self.config = config
@@ -30,12 +30,12 @@ class Tapestry(Tool):
 			'./server /config 9010 /app'
 		)
 
-		fallback_dir = os.path.join(os.path.dirname(__file__), '../../tapestry')
+		fallback_dir = os.path.join(os.path.dirname(__file__), 'tapestry')
 
 		self.tapestry_path = self.config['tapestry'].get('directory', fallback_dir)
 		self.app_path = os.path.join(self.tapestry_path, 'app')
 		self.config_path = os.path.join(self.tapestry_path, 'config')
-		self.data_path = data_path
+		self.data_sources = data_sources
 
 		self.set_config()
 
@@ -45,8 +45,7 @@ class Tapestry(Tool):
 			tapestry_config = json.load(_file)
 			new_config = deepcopy(tapestry_config)
 
-			data_file = os.listdir(self.data_path)[0]
-			filename = os.path.split(data_file)[1]
+			filename = self.config['tapestry']['filename']
 
 			# Set dataset-specific Tapestry configuration
 			new_config['filename'] = f'/data/{filename}'
@@ -65,6 +64,15 @@ class Tapestry(Tool):
 	def start(self):
 		docker = from_env()
 
+		mounts = [f'{self.app_path}:/app:ro', f'{self.config_path}:/config:ro']
+		data_paths = self.data_sources[0]
+		if len(data_paths) > 1:
+			for index, data_path in enumerate(data_paths):
+				mounts.append(f'{data_path}:/data/{index}:ro')
+		else:
+			mounts.append(f'{data_paths[0]}:/data:ro')
+		print(mounts)
+
 		port = self.config['cluster'].get('port', 8080)
 		docker.services.create(
 			'evilkermit/substrate_tapestry:latest',
@@ -76,11 +84,7 @@ class Tapestry(Tool):
 				mode='replicated',
 				replicas=self.config['cluster'].get('replicas', 1)
 			),
-			mounts=[
-				f'{self.app_path}:/app:ro',
-				f'{self.config_path}:/config:ro',
-				f'{self.data_path}:/data:ro'
-			],
+			mounts=mounts,
 			name='tapestry',
 			networks=['substrate-tapestry-net']
 		)
@@ -102,10 +106,11 @@ class Tapestry(Tool):
 			f's3://{self.config["aws"]["bucket"]}/config'
 		], check=True)
 
-		subprocess.run([
-			'aws',
-			's3',
-			'sync',
-			self.data_path,
-			f's3://{self.config["aws"]["bucket"]}/data'
-		], check=True)
+		for data_path in self.data_sources[0]:
+			subprocess.run([
+				'aws',
+				's3',
+				'sync',
+				data_path,
+				f's3://{self.config["aws"]["bucket"]}/data'
+			], check=True)

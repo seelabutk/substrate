@@ -8,8 +8,8 @@ from . import Tool
 
 
 class VCI(Tool):
-	def __init__(self, config, data_path):
-		super().__init__(config, data_path)
+	def __init__(self, config, data_sources):
+		super().__init__(config, data_sources)
 
 		self.name = 'vci'
 		self.config = config
@@ -30,13 +30,21 @@ class VCI(Tool):
 			'python3.7 -u -m vci'
 		)
 
-		fallback_dir = os.path.join(os.path.dirname(__file__), '../../vci')
+		fallback_dir = os.path.join(os.path.dirname(__file__), 'vci')
 
 		self.vci_path = self.config['vci'].get('directory', fallback_dir)
-		self.data_path = data_path
+		self.data_sources = data_sources
 
 	def start(self):
 		docker = from_env()
+
+		mounts = [f'{self.vci_path}:/opt/run:ro']
+		data_paths = self.data_sources[0]
+		if len(data_paths) > 1:
+			for index, data_path in enumerate(data_paths):
+				mounts.append(f'{data_path}:/data/{index}:ro')
+		else:
+			mounts.append(f'{data_paths[0]}:/data:ro')
 
 		port = self.config['cluster'].get('port', 8080)
 		docker.services.create(
@@ -52,10 +60,7 @@ class VCI(Tool):
 				mode='replicated',
 				replicas=self.config['cluster'].get('replicas', 1)
 			),
-			mounts=[
-				f'{self.data_path}:/data:ro',
-				f'{self.vci_path}:/opt/run:ro'
-			],
+			mounts=mounts,
 			name='VCI',
 			networks=['substrate-vci-net'],
 			workdir='/opt/run'
@@ -70,10 +75,11 @@ class VCI(Tool):
 			f's3://{self.config["aws"]["bucket"]}/app'
 		], check=True)
 
-		subprocess.run([
-			'aws',
-			's3',
-			'sync',
-			self.data_path,
-			f's3://{self.config["aws"]["bucket"]}/data'
-		], check=True)
+		for data_path in self.data_sources[0]:
+			subprocess.run([
+				'aws',
+				's3',
+				'sync',
+				data_path,
+				f's3://{self.config["aws"]["bucket"]}/data'
+			], check=True)
