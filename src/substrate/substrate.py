@@ -10,7 +10,7 @@ from aws_cdk.core import App
 import yaml
 
 from .classes import SubstrateStack, SubstrateSwarm
-from .classes.tools import Tapestry, VCI
+from .tools import Tapestry, VCI
 
 MODULES = {
 	'tapestry': Tapestry,
@@ -23,38 +23,52 @@ class Substrate():
 		self.tool_name = tool_name
 		self.path, self.config = self._parse_yaml(path)
 
-		data_path = self._get_data(self.config)
+		data_sources = self._get_data(self.config)
 
 		if tool_name not in MODULES:
 			raise Exception(f'No tool named {tool_name}')
-		self.tool = MODULES[tool_name](self.config, data_path)
+		self.tool = MODULES[tool_name](self.config, data_sources)
 
 		self.is_aws = self.config.get('aws', None) is not None
 		self.is_local = self.config.get('cluster', None) is not None
 
 		if self.is_aws:
 			app = App()
-			SubstrateStack(app, 'substrate-stack', self.tool, self.config)
+			SubstrateStack(
+				app,
+				'substrate-stack',
+				self.tool,
+				self.config,
+				data_sources[1]
+			)
 			app.synth()
 
 	def _get_data(self, config):
-		source_path = config['data']['source']
+		source_paths = config['data']['source']
+		data_paths = []
+		data_urls = []
 
-		# Download the dataset if necessary to the target location
-		if urlparse(source_path).scheme != '':
-			target_path = os.path.abspath(config['data']['target'])
+		for source_path in source_paths:
+			is_url = urlparse(source_path).scheme != ''
 
-			os.makedirs(os.path.dirname(target_path), exist_ok=True)
-			urlretrieve(source_path, target_path)
+			# Download the dataset if necessary to the target location
+			if is_url and self.is_local:
+				target_path = os.path.abspath(config['data']['target'])
 
-			data_path = target_path
-		else:
-			data_path = os.path.abspath(source_path)
+				os.makedirs(os.path.dirname(target_path), exist_ok=True)
+				urlretrieve(source_path, target_path)
 
-		if os.path.isfile(data_path):
-			data_path = os.path.dirname(data_path)
+				if target_path not in data_paths:
+					data_paths.append(target_path)
+			elif is_url:
+				data_urls.append(source_path)
+			else:
+				data_paths.append(os.path.abspath(source_path))
 
-		return data_path
+			if os.path.isfile(data_paths[-1]):
+				data_paths[-1] = os.path.dirname(data_paths[-1])
+
+		return (data_paths, data_urls)
 
 	def _parse_yaml(self, path):
 		config_name = 'substrate.config.yaml'
@@ -86,14 +100,12 @@ class Substrate():
 
 	def start(self):
 		if self.is_aws:
-			file_path = os.path.realpath(__file__)
-
 			subprocess.run([
 				'npx',
 				'cdk',
 				'deploy',
 				'--app',
-				f'"python {file_path} {self.tool_name} synth -c {self.path}"'
+				f'"substrate {self.tool_name} -c {self.path} synth"'
 			], check=True)
 		elif self.is_local:
 			swarm = SubstrateSwarm(self.tool, self.config)
@@ -101,14 +113,12 @@ class Substrate():
 
 	def stop(self):
 		if self.is_aws:
-			file_path = os.path.realpath(__file__)
-
 			subprocess.run([
 				'npx',
 				'cdk',
 				'destroy',
 				'--app',
-				f'"python {file_path} {self.tool_name} synth -c {self.path}"'
+				f'"substrate {self.tool_name} -c {self.path} synth"'
 			], check=True)
 			subprocess.run([
 				'aws',

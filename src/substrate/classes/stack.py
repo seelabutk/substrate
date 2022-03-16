@@ -7,9 +7,10 @@ from aws_cdk.core import RemovalPolicy, Stack
 
 
 class SubstrateStack(Stack):
-	def __init__(self, scope, _id, tool, config, **kwargs):
+	def __init__(self, scope, _id, tool, config, data_urls, **kwargs):
 		self.tool = tool
 		self.config = config
+		self.data_urls = data_urls
 
 		self.tool.upload_to_s3()
 
@@ -68,6 +69,10 @@ class SubstrateStack(Stack):
 			udata.add_commands(
 				f'aws s3 sync s3://{self.config["aws"]["bucket"]} /mnt/efs'
 			)
+			udata.add_commands('cd /data')
+			for data_url in self.data_urls:
+				udata.add_commands(f'curl -O {data_url}')
+			udata.add_commands('cd -')
 			udata.add_commands('mkdir /mnt/efs/swarm')
 			udata.add_commands('docker swarm init')
 			udata.add_commands(
