@@ -71,7 +71,6 @@ class Tapestry(Tool):
 				mounts.append(f'{data_path}:/data/{index}:ro')
 		else:
 			mounts.append(f'{data_paths[0]}:/data:ro')
-		print(mounts)
 
 		port = self.config['cluster'].get('port', 8080)
 		docker.services.create(
