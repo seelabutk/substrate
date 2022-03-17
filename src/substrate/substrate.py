@@ -23,25 +23,14 @@ class Substrate():
 		self.tool_name = tool_name
 		self.path, self.config = self._parse_yaml(path)
 
-		data_sources = self._get_data(self.config)
+		self.data_sources = self._get_data(self.config)
 
 		if tool_name not in MODULES:
 			raise Exception(f'No tool named {tool_name}')
-		self.tool = MODULES[tool_name](self.config, data_sources)
+		self.tool = MODULES[tool_name](self.config, self.data_sources)
 
 		self.is_aws = self.config.get('aws', None) is not None
 		self.is_local = self.config.get('cluster', None) is not None
-
-		if self.is_aws:
-			app = App()
-			SubstrateStack(
-				app,
-				'substrate-stack',
-				self.tool,
-				self.config,
-				data_sources[1]
-			)
-			app.synth()
 
 	def _get_data(self, config):
 		source_paths = config['data']['source']
@@ -99,17 +88,47 @@ class Substrate():
 		return (path, _config)
 
 	def start(self):
+		location = None
+
 		if self.is_aws:
+			app = App()
+			stack = SubstrateStack(
+				app,
+				'substrate-stack',
+				self.tool,
+				self.config,
+				self.data_sources[1]
+			)
+			app.synth()
+
 			subprocess.run([
 				'npx',
 				'cdk',
 				'deploy',
+				'--require-approval',
+				'never',
 				'--app',
 				f'"substrate {self.tool_name} -c {self.path} synth"'
 			], check=True)
-		elif self.is_local:
+
+			location = subprocess.check_output([
+				'aws',
+				'ec2',
+				'describe-instances',
+				'--filters',
+				'Name=instance-state-name,Values=running',
+				f'Name=tag:Name,Values=substrate-stack/{stack.leader_name}',
+				'--query',
+				'Reservations[*].Instances[*].[PublicIpAddress]',
+				'--output',
+				'text'
+			]).strip().decode('utf-8')
+
+		if self.is_local:
 			swarm = SubstrateSwarm(self.tool, self.config)
-			swarm.start()
+			location = swarm.start()
+
+		return f'https://{location}'
 
 	def stop(self):
 		if self.is_aws:
@@ -117,6 +136,7 @@ class Substrate():
 				'npx',
 				'cdk',
 				'destroy',
+				'--force',
 				'--app',
 				f'"substrate {self.tool_name} -c {self.path} synth"'
 			], check=True)
@@ -153,6 +173,8 @@ def main():
 
 	substrate = Substrate(args.tool, args.path)
 	if args.action == 'start':
-		substrate.start()
+		print(
+			f'You may view your new visualization stack here: {substrate.start()}.'
+		)
 	if args.action == 'stop':
 		substrate.stop()

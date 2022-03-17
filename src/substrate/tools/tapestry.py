@@ -10,12 +10,13 @@ from docker.types.services import EndpointSpec, ServiceMode
 from . import Tool
 
 
-class Tapestry(Tool):
+class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 	def __init__(self, config, data_sources):
 		super().__init__(config, data_sources)
 
 		self.name = 'tapestry'
 		self.config = config
+		self.port = 8000
 
 		self.service_command = (
 			'docker service create '
@@ -72,12 +73,12 @@ class Tapestry(Tool):
 		else:
 			mounts.append(f'{data_paths[0]}:/data:ro')
 
-		port = self.config['cluster'].get('port', 8080)
+		self.port = self.config['cluster'].get('port', self.port)
 		docker.services.create(
 			'evilkermit/substrate_tapestry:latest',
 			'./server',
 			args=['/config', '9010', '/app'],
-			endpoint_spec=EndpointSpec(ports={port: (9010, 'tcp')}),
+			endpoint_spec=EndpointSpec(ports={self.port: (9010, 'tcp')}),
 			env=['APP_DIR=/app'],
 			mode=ServiceMode(
 				mode='replicated',
