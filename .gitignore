@@ -1,5 +1,5 @@
 run
 node_modules
 cdk.out
-substrate.egg-info
+*.egg-info
 dist
