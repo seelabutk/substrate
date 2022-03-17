@@ -13,6 +13,7 @@ class VCI(Tool):
 
 		self.name = 'vci'
 		self.config = config
+		self.port = 8000
 
 		self.vci_pattern = self.config['vci']['file_pattern']
 
@@ -46,12 +47,12 @@ class VCI(Tool):
 		else:
 			mounts.append(f'{data_paths[0]}:/data:ro')
 
-		port = self.config['cluster'].get('port', 8080)
+		self.port = self.config['cluster'].get('port', self.port)
 		docker.services.create(
 			'evilkermit/substrate_vci:latest',
 			'python3.7',
 			args=['-u', '-m', 'vci'],
-			endpoint_spec=EndpointSpec(ports={port: (8840, 'tcp')}),
+			endpoint_spec=EndpointSpec(ports={self.port: (8840, 'tcp')}),
 			env=[
 				f'VCI_PATTERN={self.vci_pattern}',
 				'VCI_ROOT=/data'

@@ -6,11 +6,12 @@ import aws_cdk.aws_iam as iam
 from aws_cdk.core import RemovalPolicy, Stack
 
 
-class SubstrateStack(Stack):
+class SubstrateStack(Stack):  # pylint: disable=too-many-instance-attributes
 	def __init__(self, scope, _id, tool, config, data_urls, **kwargs):
 		self.tool = tool
 		self.config = config
 		self.data_urls = data_urls
+		self.leader_name = ''
 
 		self.tool.upload_to_s3()
 
@@ -100,6 +101,8 @@ class SubstrateStack(Stack):
 			count = managers.get(_type, 1)
 			for index2 in range(count):
 				if index == 0 and index2 == 0:
+					self.leader_name = f'substrate-manager-{_type}-{index}'
+
 					udata = self.get_udata('leader')
 				else:
 					udata = self.get_udata('manager')

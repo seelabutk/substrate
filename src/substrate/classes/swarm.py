@@ -72,6 +72,8 @@ class SubstrateSwarm():
 		self.tool.start()
 		self.log('✓\n')
 
+		return f'http://127.0.0.1:{self.tool.port}'
+
 	def destroy_swarm(self):
 		nodes = []
 		for node in self.config['cluster'].get('managers', []):
@@ -108,7 +110,7 @@ class SubstrateSwarm():
 		print(message, end='')
 
 	def start(self):
-		self.create_swarm()
+		return self.create_swarm()
 
 	def stop(self):
 		self.destroy_swarm()
