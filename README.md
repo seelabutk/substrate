@@ -25,7 +25,7 @@ This tool relies upon Docker Swarm. In order for it to work, the following assum
 
 To install run
 
-	pip install substrate
+	pip install seelabutk-substrate
 
 then launch a visualization tool via a CLI using
 
