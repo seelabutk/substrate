@@ -32,6 +32,17 @@ class Substrate():
 		self.is_aws = self.config.get('aws', None) is not None
 		self.is_local = self.config.get('cluster', None) is not None
 
+		if self.is_aws:
+			app = App()
+			SubstrateStack(
+				app,
+				'substrate-stack',
+				self.tool,
+				self.config,
+				self.data_sources[1]
+			)
+			app.synth()
+
 	def _get_data(self, config):
 		source_paths = config['data']['source']
 		data_paths = []
@@ -91,16 +102,6 @@ class Substrate():
 		location = None
 
 		if self.is_aws:
-			app = App()
-			stack = SubstrateStack(
-				app,
-				'substrate-stack',
-				self.tool,
-				self.config,
-				self.data_sources[1]
-			)
-			app.synth()
-
 			subprocess.run([
 				'npx',
 				'cdk',
@@ -117,7 +118,7 @@ class Substrate():
 				'describe-instances',
 				'--filters',
 				'Name=instance-state-name,Values=running',
-				f'Name=tag:Name,Values=substrate-stack/{stack.leader_name}',
+				'Name=tag:Name,Values=substrate-stack/substrate-leader',
 				'--query',
 				'Reservations[*].Instances[*].[PublicIpAddress]',
 				'--output',

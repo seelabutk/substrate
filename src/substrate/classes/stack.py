@@ -101,15 +101,15 @@ class SubstrateStack(Stack):  # pylint: disable=too-many-instance-attributes
 			count = managers.get(_type, 1)
 			for index2 in range(count):
 				if index == 0 and index2 == 0:
-					self.leader_name = f'substrate-manager-{_type}-{index}'
-
+					instance_name = 'substrate-leader'
 					udata = self.get_udata('leader')
 				else:
+					instance_name = f'substrate-manager-{_type}-{index}'
 					udata = self.get_udata('manager')
 
 				nodes.append(ec2.Instance(
 					self,
-					f'substrate-manager-{_type}-{index}',
+					instance_name,
 					instance_type=ec2.InstanceType(instance_type_identifier=_type),
 					machine_image=self.ami,
 					role=self.role,
