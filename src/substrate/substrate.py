@@ -23,14 +23,14 @@ class Substrate():
 		self.tool_name = tool_name
 		self.path, self.config = self._parse_yaml(path)
 
+		self.is_aws = self.config.get('aws', None) is not None
+		self.is_local = self.config.get('cluster', None) is not None
+
 		self.data_sources = self._get_data(self.config)
 
 		if tool_name not in MODULES:
 			raise Exception(f'No tool named {tool_name}')
 		self.tool = MODULES[tool_name](self.config, self.data_sources)
-
-		self.is_aws = self.config.get('aws', None) is not None
-		self.is_local = self.config.get('cluster', None) is not None
 
 		if self.is_aws:
 			app = App()
@@ -49,7 +49,7 @@ class Substrate():
 		data_urls = []
 
 		for source_path in source_paths:
-			is_url = urlparse(source_path).scheme != ''
+			is_url = urlparse(source_path).scheme.startswith(('ftp', 'http'))
 
 			# Download the dataset if necessary to the target location
 			if is_url and self.is_local:

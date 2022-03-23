@@ -72,7 +72,7 @@ class SubstrateSwarm():
 		self.tool.start()
 		self.log('✓\n')
 
-		return f'http://127.0.0.1:{self.tool.port}'
+		return f'127.0.0.1:{self.tool.port}'
 
 	def destroy_swarm(self):
 		nodes = []

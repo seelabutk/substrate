@@ -5,6 +5,7 @@ import os
 import subprocess
 
 from docker import from_env
+from docker.types import Mount
 from docker.types.services import EndpointSpec, ServiceMode
 
 from . import Tool
@@ -65,13 +66,18 @@ class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 	def start(self):
 		docker = from_env()
 
-		mounts = [f'{self.app_path}:/app:ro', f'{self.config_path}:/config:ro']
+		mounts = [
+			Mount('/app', self.app_path, type='bind', read_only=True),
+			Mount('/config', self.config_path, type='bind', read_only=True)
+		]
 		data_paths = self.data_sources[0]
 		if len(data_paths) > 1:
 			for index, data_path in enumerate(data_paths):
-				mounts.append(f'{data_path}:/data/{index}:ro')
+				mounts.append(
+					Mount(f'/data/{index}', data_path, type='bind', read_only=True)
+				)
 		else:
-			mounts.append(f'{data_paths[0]}:/data:ro')
+			mounts.append(Mount('/data', data_paths[0], type='bind', read_only=True))
 
 		self.port = self.config['cluster'].get('port', self.port)
 		docker.services.create(
