@@ -1,4 +1,7 @@
 [project]
+name = "seelabutk-substrate"
+requires-python = ">=3.7"
+version = "0.4"
 dependencies = [
 	'aws-cdk.core ~= 1.147.0',
 	'aws-cdk.aws-ec2 ~= 1.147.0',
