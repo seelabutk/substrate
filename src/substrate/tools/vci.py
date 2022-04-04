@@ -38,17 +38,11 @@ class VCI(Tool):
 		self.data_sources = data_sources
 
 	def start(self):
+		mounts = super().start()
+
 		docker = from_env()
 
-		mounts = [Mount('/opt/run', self.vci_path, type='bind', read_only=True)]
-		data_paths = self.data_sources[0]
-		if len(data_paths) > 1:
-			for index, data_path in enumerate(data_paths):
-				mounts.append(
-					Mount(f'/data/{index}', data_path, type='bind', read_only=True)
-				)
-		else:
-			mounts.append(Mount('/data', data_paths[0], type='bind', read_only=True))
+		mounts.append(Mount('/opt/run', self.vci_path, type='bind', read_only=True))
 
 		self.port = self.config['cluster'].get('port', self.port)
 		docker.services.create(
@@ -71,6 +65,8 @@ class VCI(Tool):
 		)
 
 	def upload_to_s3(self):
+		super().upload_to_s3()
+
 		subprocess.run([
 			'aws',
 			's3',
@@ -78,12 +74,3 @@ class VCI(Tool):
 			self.vci_path,
 			f's3://{self.config["aws"]["bucket"]}/app'
 		], check=True)
-
-		for data_path in self.data_sources[0]:
-			subprocess.run([
-				'aws',
-				's3',
-				'sync',
-				data_path,
-				f's3://{self.config["aws"]["bucket"]}/data'
-			], check=True)
