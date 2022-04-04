@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+import subprocess
+import time
 
 from docker import from_env
 import paramiko
@@ -70,6 +72,29 @@ class SubstrateSwarm():
 
 		self.log('Creating the swarm service…')
 		self.tool.start()
+		self.log('✓\n')
+
+		self.log('Waiting for the service to be stable…')
+		output = subprocess.check_output([
+			'docker',
+			'service',
+			'ps',
+			'ospray_studio',
+			'--format',
+			'"{{.CurrentState}}"'
+		]).decode('utf-8').split('\n')
+		invalid_outputs = [line for line in output if len(line) > 0 and not line.startswith('"Running')]  # noqa: E501
+		while invalid_outputs:
+			time.sleep(1)
+			output = subprocess.check_output([
+				'docker',
+				'service',
+				'ps',
+				'ospray_studio',
+				'--format',
+				'"{{.CurrentState}}"'
+			]).decode('utf-8').split('\n')
+			invalid_outputs = [line for line in output if len(line) > 0 and not line.startswith('"Running')]  # noqa: E501
 		self.log('✓\n')
 
 		return f'127.0.0.1:{self.tool.port}'
