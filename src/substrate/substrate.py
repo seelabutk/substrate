@@ -10,12 +10,13 @@ from aws_cdk.core import App
 import yaml
 
 from .classes import SubstrateStack, SubstrateSwarm
-from .tools import OSPRayStudio, Tapestry, VCI
+from .tools import OSPRayStudio, Tapestry, VCI, DCHM
 
 MODULES = {
 	'ospray_studio': OSPRayStudio,
 	'tapestry': Tapestry,
-	'vci': VCI
+	'vci': VCI,
+	'DCHM': DCHM 
 }
 
 
@@ -159,7 +160,7 @@ def main():
 
 	parser.add_argument(
 		'tool',
-		help='The visualization tool to run [ospray_studio, tapestry, vci]',
+		help='The visualization tool to run [ospray_studio, tapestry, vci, dchm]',
 		metavar='TOOL'
 	)
 	parser.add_argument(

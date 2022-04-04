@@ -1,0 +1,11 @@
+### Define the data source
+data:
+  source:
+    - ./
+
+
+### Local deployment
+### Each node should have Docker Engine installed.
+cluster:
+  port: 8000
+  replicas: 10
