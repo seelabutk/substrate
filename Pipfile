@@ -9,7 +9,7 @@ name = "pypi"
 'aws-cdk.aws-efs' = "~=1.147.0"
 'aws-cdk.aws-iam' = "~=1.147.0"
 docker = "*"
-paramiko = "*"
+paramiko = ">=2.10.1"
 PyYAML = "*"
 
 [dev-packages]
