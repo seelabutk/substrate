@@ -1,7 +1,4 @@
-import subprocess
-
 from docker import from_env
-from docker.types import Mount
 from docker.types.services import EndpointSpec, ServiceMode
 
 from . import Tool
@@ -28,17 +25,9 @@ class OSPRayStudio(Tool):
 		)
 
 	def start(self):
-		docker = from_env()
+		mounts = super().start()
 
-		mounts = []
-		data_paths = self.data_sources[0]
-		if len(data_paths) > 1:
-			for index, data_path in enumerate(data_paths):
-				mounts.append(
-					Mount(f'/data/{index}', data_path, type='bind', read_only=True)
-				)
-		else:
-			mounts.append(Mount('/data', data_paths[0], type='bind', read_only=True))
+		docker = from_env()
 
 		self.port = self.config['cluster'].get('port', self.port)
 		docker.services.create(
@@ -54,13 +43,3 @@ class OSPRayStudio(Tool):
 			name='ospray_studio',
 			networks=['substrate-ospray-studio-net']
 		)
-
-	def upload_to_s3(self):
-		for data_path in self.data_sources[0]:
-			subprocess.run([
-				'aws',
-				's3',
-				'sync',
-				data_path,
-				f's3://{self.config["aws"]["bucket"]}/data'
-			], check=True)

@@ -64,20 +64,13 @@ class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 				json.dump(new_config, _file)
 
 	def start(self):
+		mounts = super().start()
 		docker = from_env()
 
-		mounts = [
-			Mount('/app', self.app_path, type='bind', read_only=True),
+		mounts.append(Mount('/app', self.app_path, type='bind', read_only=True))
+		mounts.append(
 			Mount('/config', self.config_path, type='bind', read_only=True)
-		]
-		data_paths = self.data_sources[0]
-		if len(data_paths) > 1:
-			for index, data_path in enumerate(data_paths):
-				mounts.append(
-					Mount(f'/data/{index}', data_path, type='bind', read_only=True)
-				)
-		else:
-			mounts.append(Mount('/data', data_paths[0], type='bind', read_only=True))
+		)
 
 		self.port = self.config['cluster'].get('port', self.port)
 		docker.services.create(
@@ -96,6 +89,8 @@ class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 		)
 
 	def upload_to_s3(self):
+		super().upload_to_s3()
+
 		subprocess.run([
 			'aws',
 			's3',
@@ -111,12 +106,3 @@ class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 			self.config_path,
 			f's3://{self.config["aws"]["bucket"]}/config'
 		], check=True)
-
-		for data_path in self.data_sources[0]:
-			subprocess.run([
-				'aws',
-				's3',
-				'sync',
-				data_path,
-				f's3://{self.config["aws"]["bucket"]}/data'
-			], check=True)
