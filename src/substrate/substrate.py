@@ -78,13 +78,6 @@ class Substrate():
 			path = os.getcwd()
 
 			files = os.listdir(path)
-			while config_name not in files:
-				path = os.path.abspath(os.path.join(path, '..'))
-				files = os.listdir(path)
-
-				if path == '/':
-					break
-
 			if config_name not in files:
 				raise FileNotFoundError(config_name)
 
