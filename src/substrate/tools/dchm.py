@@ -1,7 +1,4 @@
-import subprocess
-
 from docker import from_env
-from docker.types import Mount
 from docker.types.services import EndpointSpec, ServiceMode
 
 from . import Tool
@@ -18,7 +15,6 @@ class DCHM(Tool):
 
 	def start(self):
 		docker = from_env()
-		mounts = []
 		self.port = self.config['cluster'].get('port', self.port)
 		docker.services.create(
 			'npatel79/water-and-land:latest',
@@ -29,6 +25,5 @@ class DCHM(Tool):
 				mode='replicated',
 				replicas=self.config['cluster'].get('replicas', 1)
 			),
-			mounts=mounts,
 			name='DCHM',
 		)
