@@ -8,13 +8,27 @@ class DCHM(Tool):
 	def __init__(self, config, data_sources):
 		super().__init__(config, data_sources)
 
-		self.name = 'DCHM'
+		self.name = 'dchm'
 		self.port = 8000
-		self.data_sources = data_sources
+
 		self.config = config
+		self.data_sources = data_sources
+
+		self.service_command = (
+			'docker service create '
+			'--name dchm '
+			'--publish 80:5000/tcp '
+			f'--replicas {self.config.get("aws", {}).get("replicas", 1)} '
+			'--mount type=bind,src=/mnt/efs/data,dst=/data '
+			'npatel79/water-and-land:latest '
+			'flask run --host=0.0.0.0'
+		)
 
 	def start(self):
+		mounts = super().start()
+
 		docker = from_env()
+
 		self.port = self.config['cluster'].get('port', self.port)
 		docker.services.create(
 			'npatel79/water-and-land:latest',
@@ -25,5 +39,7 @@ class DCHM(Tool):
 				mode='replicated',
 				replicas=self.config['cluster'].get('replicas', 1)
 			),
-			name='DCHM',
+			mounts=mounts,
+			name='dchm',
+			networks=['substrate-dchm']
 		)
