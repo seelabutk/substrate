@@ -33,7 +33,7 @@ class OSPRayStudio(Tool):
 		docker.services.create(
 			'evilkermit/substrate_ospray_studio:latest',
 			'flask',
-			args=['run', '--host=0.0.0.0'],
+			args=['run', '--cert=adhoc', '--host=0.0.0.0'],
 			endpoint_spec=EndpointSpec(ports={self.port: (5000, 'tcp')}),
 			mode=ServiceMode(
 				mode='replicated',
