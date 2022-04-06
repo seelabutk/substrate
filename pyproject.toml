@@ -19,7 +19,7 @@ entry-points = {console_scripts = {substrate = "substrate.substrate:main"}}
 license = {file = "LICENSE"}
 readme = "README.md"
 requires-python = ">=3.7"
-version = "0.14"
+version = "0.15"
 
 [project.urls]
 Homepage = "https://github.com/seelabutk/substrate/"
