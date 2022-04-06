@@ -20,9 +20,10 @@ class OSPRayStudio(Tool):
 			'--publish 443:5000/tcp '
 			f'--replicas {self.config.get("aws", {}).get("replicas", 1)} '
 			'--mount type=bind,src=/mnt/efs/data,dst=/data '
+			'--mount type=bind,src=/etc/pki/tls/private,dst=/certs '
 			'evilkermit/substrate_ospray_studio:latest '
 			'flask run --host=0.0.0.0 '
-			'--cert=/etc/pki/tls/private/cert.pem --key=/etc/pki/tls/private/cert.key'
+			'--cert=/certs/cert.pem --key=/certs/cert.key'
 		)
 
 	def start(self):
