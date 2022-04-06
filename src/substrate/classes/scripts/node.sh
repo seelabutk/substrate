@@ -2,14 +2,6 @@ sudo yum update -y
 sudo amazon-linux-extras install docker
 sudo service docker start
 sudo usermod -a -G docker ec2-user
-sudo service httpd start
-
-sudo mkdir -p /etc/pki/tls/private
-sudo cd /etc/pki/tls/private
-sudo openssl genrsa -out cert.key 4096
-sudo chown root:root cert.key
-sudo chmod 600 cert.key
-sudo openssl req -new -key cert.key -out cert.pem -subj="/C=US/ST=Tennessee/L=Knoxville/O=University of Tennessee/OU=Seelab/CN=github.com\/seelabutk"
 
 sudo yum install -y amazon-efs-utils
 sudo yum install -y python3

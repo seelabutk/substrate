@@ -67,6 +67,16 @@ class SubstrateStack(Stack):  # pylint: disable=too-many-instance-attributes
 		udata.add_commands(self.global_commands)
 
 		if _type == 'leader':
+			udata.add_commands('sudo mkdir -p /etc/pki/tls/private')
+			udata.add_commands('cd /etc/pki/tls/private')
+			udata.add_commands('sudo openssl genrsa -out cert.key 4096')
+			udata.add_commands('sudo chown root:root cert.key')
+			udata.add_commands('sudo chmod 600 cert.key')
+			udata.add_commands(
+				'sudo openssl req -new -key cert.key -out cert.pem -subj "/C=US/'
+				'ST=Tennessee/L=Knoxville/O=University of Tennessee/OU=Seelab/'
+				'CN=github.com\/seelabutk"'  # pylint: disable=anomalous-backslash-in-string # noqa: E501,W605
+			)
 			udata.add_commands(
 				f'aws s3 sync s3://{self.config["aws"]["bucket"]} /mnt/efs'
 			)
