@@ -1,7 +1,10 @@
 [project]
 name = "seelabutk-substrate"
-requires-python = ">=3.7"
-version = "0.8"
+authors = [{name = "John Duggan", email = "jduggan1@vols.utk.edu"}]
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"Operating System :: OS Independent"
+]
 dependencies = [
 	'aws-cdk.core ~= 1.147.0',
 	'aws-cdk.aws-ec2 ~= 1.147.0',
@@ -11,6 +14,17 @@ dependencies = [
 	'paramiko ~= 2.9.2',
 	'PyYAML ~= 6.0'
 ]
+description = "Automatically deploys visualization services via Docker Swarm"
+license = {file = "LICENSE"}
+readme = "README.md"
+requires-python = ">=3.7"
+version = "0.9"
+
+[project.entry-points.substrate]
+substrate = "substrate.substrate:main"
+
+[project.urls]
+Homepage = "https://github.com/seelabutk/substrate/"
 
 [build-system]
 requires = ["setuptools>=42"]
