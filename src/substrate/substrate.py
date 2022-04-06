@@ -124,6 +124,8 @@ class Substrate():
 			swarm = SubstrateSwarm(self.tool, self.config)
 			location = swarm.start()
 
+			return f'http://{location}'
+
 		return f'https://{location}'
 
 	def stop(self):

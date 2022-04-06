@@ -33,7 +33,7 @@ class DCHM(Tool):
 		docker.services.create(
 			'npatel79/water-and-land:latest',
 			'flask',
-			args=['run', '--cert=adhoc', '--host=0.0.0.0'],
+			args=['run', '--host=0.0.0.0'],
 			endpoint_spec=EndpointSpec(ports={self.port: (5000, 'tcp')}),
 			mode=ServiceMode(
 				mode='replicated',

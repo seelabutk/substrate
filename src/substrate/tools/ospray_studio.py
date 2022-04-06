@@ -21,7 +21,7 @@ class OSPRayStudio(Tool):
 			f'--replicas {self.config.get("aws", {}).get("replicas", 1)} '
 			'--mount type=bind,src=/mnt/efs/data,dst=/data '
 			'evilkermit/substrate_ospray_studio:latest '
-			'flask run --host=0.0.0.0'
+			'flask run --cert=cert.pem --key=key.pem --host=0.0.0.0'
 		)
 
 	def start(self):
@@ -33,7 +33,7 @@ class OSPRayStudio(Tool):
 		docker.services.create(
 			'evilkermit/substrate_ospray_studio:latest',
 			'flask',
-			args=['run', '--cert=adhoc', '--host=0.0.0.0'],
+			args=['run', '--host=0.0.0.0'],
 			endpoint_spec=EndpointSpec(ports={self.port: (5000, 'tcp')}),
 			mode=ServiceMode(
 				mode='replicated',
