@@ -18,7 +18,7 @@ description = "Automatically deploys visualization services via Docker Swarm"
 license = {file = "LICENSE"}
 readme = "README.md"
 requires-python = ">=3.7"
-version = "0.9"
+version = "0.10"
 
 [project.entry-points.substrate]
 substrate = "substrate.substrate:main"
