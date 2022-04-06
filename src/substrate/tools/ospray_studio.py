@@ -17,11 +17,12 @@ class OSPRayStudio(Tool):
 		self.service_command = (
 			'docker service create '
 			'--name ospray_studio '
-			'--publish 80:5000/tcp '
+			'--publish 443:5000/tcp '
 			f'--replicas {self.config.get("aws", {}).get("replicas", 1)} '
 			'--mount type=bind,src=/mnt/efs/data,dst=/data '
 			'evilkermit/substrate_ospray_studio:latest '
-			'flask run --cert=cert.pem --key=key.pem --host=0.0.0.0'
+			'flask run --host=0.0.0.0 '
+			'--cert=/etc/pki/tls/private/cert.pem --key=/etc/pki/tls/private/cert.key'
 		)
 
 	def start(self):
