@@ -79,7 +79,7 @@ class SubstrateSwarm():
 			'docker',
 			'service',
 			'ps',
-			'ospray_studio',
+			self.tool.name,
 			'--format',
 			'"{{.CurrentState}}"'
 		]).decode('utf-8').split('\n')
@@ -90,7 +90,7 @@ class SubstrateSwarm():
 				'docker',
 				'service',
 				'ps',
-				'ospray_studio',
+				self.tool.name,
 				'--format',
 				'"{{.CurrentState}}"'
 			]).decode('utf-8').split('\n')

@@ -41,5 +41,5 @@ class DCHM(Tool):
 			),
 			mounts=mounts,
 			name='dchm',
-			networks=['substrate-dchm']
+			networks=['substrate-dchm-net']
 		)
