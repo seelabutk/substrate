@@ -8,7 +8,7 @@ class OSPRayStudio(Tool):
 	def __init__(self, config, data_sources):
 		super().__init__(config, data_sources)
 
-		self.name = 'ospray-studio'
+		self.name = 'ospray_studio'
 		self.port = 8000
 
 		self.config = config
@@ -17,13 +17,11 @@ class OSPRayStudio(Tool):
 		self.service_command = (
 			'docker service create '
 			'--name ospray_studio '
-			'--publish 443:443/tcp '
+			'--publish 80:5000/tcp '
 			f'--replicas {self.config.get("aws", {}).get("replicas", 1)} '
 			'--mount type=bind,src=/mnt/efs/data,dst=/data '
-			'--mount type=bind,src=/etc/pki/tls/private,dst=/certs '
 			'evilkermit/substrate_ospray_studio:latest '
-			'flask run --host=0.0.0.0 --port=443 '
-			'--cert=/certs/cert.pem --key=/certs/key.pem'
+			'flask run --host=0.0.0.0'
 		)
 
 	def start(self):
@@ -43,5 +41,5 @@ class OSPRayStudio(Tool):
 			),
 			mounts=mounts,
 			name='ospray_studio',
-			networks=['substrate-ospray-studio-net']
+			networks=['substrate-ospray_studio-net']
 		)

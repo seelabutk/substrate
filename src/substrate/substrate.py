@@ -124,10 +124,7 @@ class Substrate():
 			swarm = SubstrateSwarm(self.tool, self.config)
 			location = swarm.start()
 
-			if self.tool.port != '443':
-				return f'http://{location}'
-
-		return f'https://{location}'
+		return f'http://{location}'
 
 	def stop(self):
 		if self.is_aws:
