@@ -79,14 +79,14 @@ class SubstrateSwarm():
 			f'docker service ps {self.tool.name} --format ' + '"{{.CurrentState}}"',
 			shell=True
 		).decode('utf-8').split('\n')
-		invalid_outputs = [line for line in output if len(line) > 0 and not line.startswith('"Running')]  # noqa: E501
+		invalid_outputs = [line for line in output if len(line) > 0 and not line.startswith('Running')]  # noqa: E501
 		while invalid_outputs:
 			time.sleep(1)
 			output = subprocess.check_output(
 				f'docker service ps {self.tool.name} --format ' + '"{{.CurrentState}}"',
 				shell=True
 			).decode('utf-8').split('\n')
-			invalid_outputs = [line for line in output if len(line) > 0 and not line.startswith('"Running')]  # noqa: E501
+			invalid_outputs = [line for line in output if len(line) > 0 and not line.startswith('Running')]  # noqa: E501
 		self.log('✓\n')
 
 		return f'127.0.0.1:{self.tool.port}'
