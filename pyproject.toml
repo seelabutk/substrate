@@ -12,14 +12,15 @@ dependencies = [
 	'aws-cdk.aws-iam ~= 1.147.0',
 	'docker ~= 5.0.3',
 	'paramiko ~= 2.9.2',
-	'PyYAML ~= 6.0'
+	'PyYAML ~= 6.0',
+	'requests ~= 2.27.1'
 ]
 description = "Automatically deploys visualization services via Docker Swarm"
 entry-points = {console_scripts = {substrate = "substrate.substrate:main"}}
 license = {file = "LICENSE"}
 readme = "README.md"
 requires-python = ">=3.7"
-version = "0.17"
+version = "0.18"
 
 [project.urls]
 Homepage = "https://github.com/seelabutk/substrate/"

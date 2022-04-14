@@ -91,18 +91,14 @@ class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 	def upload_to_s3(self):
 		super().upload_to_s3()
 
-		subprocess.run([
-			'aws',
-			's3',
-			'sync',
-			self.app_path,
-			f's3://{self.config["aws"]["bucket"]}/app'
-		], check=True)
+		subprocess.run(
+			f'aws s3 sync {self.app_path} s3://{self.config["aws"]["bucket"]}/app',
+			check=True,
+			shell=True
+		)
 
-		subprocess.run([
-			'aws',
-			's3',
-			'sync',
-			self.config_path,
-			f's3://{self.config["aws"]["bucket"]}/config'
-		], check=True)
+		subprocess.run(
+			f'aws s3 sync {self.config_path} s3://{self.config["aws"]["bucket"]}/config',  # noqa: E501
+			check=True,
+			shell=True
+		)

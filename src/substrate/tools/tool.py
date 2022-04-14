@@ -31,11 +31,20 @@ class Tool():
 	# Upload files needed to run your service to S3.
 	# Upload them to mirror the directory structure you want on EFS.
 	def upload_to_s3(self):
+		print('Syncing data to S3')
+
+		output = subprocess.check_output('aws s3 ls', shell=True).decode('utf-8')
+
+		if self.config['aws']['bucket'] not in output:
+			subprocess.run(
+				f'aws s3 mb s3://{self.config["aws"]["bucket"]}',
+				check=True,
+				shell=True
+			)
+
 		for data_path in self.data_sources[0]:
-			subprocess.run([
-				'aws',
-				's3',
-				'sync',
-				data_path,
-				f's3://{self.config["aws"]["bucket"]}/data'
-			], check=True)
+			subprocess.run(
+				f'aws s3 sync {data_path} s3://{self.config["aws"]["bucket"]}/data',
+				check=True,
+				shell=True
+			)

@@ -33,7 +33,9 @@ class SubstrateStack(Stack):  # pylint: disable=too-many-instance-attributes
 				self.config['aws'].get('region', 'us-east-1'): 'ami-048ff3da02834afdc'
 			})
 		else:
-			self.ami = ec2.MachineImage.latest_amazon_linux()
+			self.ami = ec2.MachineImage.latest_amazon_linux(
+				generation=ec2.AmazonLinuxGeneration.AMAZON_LINUX_2
+			)
 
 		role_arn = self.config['aws'].get('role_arn', None)
 		if role_arn:

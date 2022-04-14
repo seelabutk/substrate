@@ -3,10 +3,12 @@ from argparse import ArgumentParser
 import os
 import subprocess
 import sys
+from time import sleep
 from urllib.request import urlretrieve
 from urllib.parse import urlparse
 
 from aws_cdk.core import App
+import requests
 import yaml
 
 from .classes import SubstrateStack, SubstrateSwarm
@@ -97,29 +99,30 @@ class Substrate():
 		location = None
 
 		if self.is_aws:
-			subprocess.run([
-				'npx',
-				'cdk',
-				'deploy',
-				'--require-approval',
-				'never',
-				'--app',
-				f'"substrate {self.tool_name} -c {self.path} synth"'
-			], check=True)
+			subprocess.run(
+				f'npx cdk deploy --require-approval never --app "substrate {self.tool_name} -c {self.path} synth"',  # noqa: E501
+				check=True,
+				shell=True
+			)
 
-			location = subprocess.check_output([
-				'aws',
-				'ec2',
-				'describe-instances',
-				'--filters',
-				'Name=instance-state-name,Values=running',
-				'Name=tag:Name,Values=substrate-stack/substrate-leader',
-				'--query',
-				'Reservations[*].Instances[*].[PublicIpAddress]',
-				'--output',
-				'text'
-			]).strip().decode('utf-8')
+			location = subprocess.check_output(
+				'aws ec2 describe-instances --filters Name=instance-state-name,Values=running Name=tag:Name,Values=substrate-stack/substrate-leader --query Reservations[*].Instances[*].[PublicIpAddress] --output text',  # noqa: E501
+				shell=True
+			).strip().decode('utf-8')
 
+			print('The CloudFormation stack has successfully deployed. It may take several minutes before the instance is ready to use.')  # noqa: E501
+			while True:
+				print('Checking if AWS instance is ready…', end='')
+				try:
+					response = requests.get(f'http://{location}')
+					if response.status_code == 200:
+						break
+				except requests.exceptions.ConnectionError:
+					pass
+
+				print("instance isn't ready yet. Trying again in 30 seconds.")
+				sleep(30)
+			print('✓')
 		if self.is_local:
 			swarm = SubstrateSwarm(self.tool, self.config)
 			location = swarm.start()
@@ -128,21 +131,16 @@ class Substrate():
 
 	def stop(self):
 		if self.is_aws:
-			subprocess.run([
-				'npx',
-				'cdk',
-				'destroy',
-				'--force',
-				'--app',
-				f'"substrate {self.tool_name} -c {self.path} synth"'
-			], check=True)
-			subprocess.run([
-				'aws',
-				's3',
-				'rm',
-				f's3://{self.config["aws"]["bucket"]}',
-				'--recursive'
-			], check=True)
+			subprocess.run(
+				f'npx cdk destroy --force --app "substrate {self.tool_name} -c {self.path} synth"',  # noqa: E501
+				check=True,
+				shell=True
+			)
+			subprocess.run(
+				f'aws s3 rm s3://{self.config["aws"]["bucket"]} --recursive',
+				check=True,
+				shell=True
+			)
 		elif self.is_local:
 			swarm = SubstrateSwarm(self.tool, self.config)
 			swarm.stop()

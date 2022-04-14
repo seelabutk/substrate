@@ -67,10 +67,8 @@ class VCI(Tool):
 	def upload_to_s3(self):
 		super().upload_to_s3()
 
-		subprocess.run([
-			'aws',
-			's3',
-			'sync',
-			self.vci_path,
-			f's3://{self.config["aws"]["bucket"]}/app'
-		], check=True)
+		subprocess.run(
+			f'aws s3 sync {self.vci_path} s3://{self.config["aws"]["bucket"]}/app',
+			check=True,
+			shell=True
+		)
