@@ -48,25 +48,29 @@ class SubstrateStack(Stack):  # pylint: disable=too-many-instance-attributes
 		with open(udata_file, 'r', encoding='utf-8') as commands:
 			self.global_commands = commands.read()
 
-		file_system = self.provision_fs()
-		self.provision_ec2(file_system)
+		self.file_system = self.provision_fs()
+		self.provision_ec2()
 
 	def get_udata(self, _type):
 		udata = ec2.UserData.for_linux()
 		# TODO: Is there a better way to give access to each node to use AWS CLI?
 		udata.add_commands(
-			f'export AWS_DEFAULT_REGION={self.config["aws"].get("region", "us-east-1")}'
+			f'export AWS_DEFAULT_REGION={self.config["aws"].get("region", "us-east-1")}',  # noqa: E501
+			f'export AWS_ACCESS_KEY_ID={os.environ.get("AWS_ACCESS_KEY_ID")}',
+			f'export AWS_SECRET_ACCESS_KEY={os.environ.get("AWS_SECRET_ACCESS_KEY")}',
+			f'export AWS_SESSION_TOKEN={os.environ.get("AWS_SESSION_TOKEN", "")}',
+			'sudo yum check-update -y',
+			'sudo yum upgrade -y',
+			'sudo amazon-linux-extras install docker',
+			'sudo service docker start',
+			'sudo usermod -a -G docker ec2-user',
+			'sudo yum install -y amazon-efs-utils',
+			'sudo yum install -y nfs-utils',
+			'sudo yum install -y python3',
+			'sudo mkdir -p "/mnt/efs"',
+			f'test -f "/sbin/mount.efs" && echo "{self.file_system.file_system_id}:/ /mnt/efs efs defaults,_netdev" >> /etc/fstab || echo "{self.file_system.file_system_id}.efs.{self.config["aws"].get("region", "us-east-1")}.amazonaws.com:/ /mnt/efs nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab',  # noqa: E501
+			'mount -a -t efs,nfs4 defaults'
 		)
-		udata.add_commands(
-			f'export AWS_ACCESS_KEY_ID={os.environ.get("AWS_ACCESS_KEY_ID")}'
-		)
-		udata.add_commands(
-			f'export AWS_SECRET_ACCESS_KEY={os.environ.get("AWS_SECRET_ACCESS_KEY")}'
-		)
-		udata.add_commands(
-			f'export AWS_SESSION_TOKEN={os.environ.get("AWS_SESSION_TOKEN", "")}'
-		)
-		udata.add_commands(self.global_commands)
 
 		if _type == 'leader':
 			udata.add_commands('sudo mkdir -p /etc/pki/tls/private')
@@ -101,7 +105,7 @@ class SubstrateStack(Stack):  # pylint: disable=too-many-instance-attributes
 
 		return udata
 
-	def provision_ec2(self, file_system):
+	def provision_ec2(self):
 		managers = self.config['aws'].get('managers', {})
 		workers = self.config['aws'].get('workers', {})
 
@@ -144,7 +148,7 @@ class SubstrateStack(Stack):  # pylint: disable=too-many-instance-attributes
 				))
 
 		for node in nodes:
-			node.node.add_dependency(file_system.mount_targets_available)
+			node.node.add_dependency(self.file_system.mount_targets_available)
 
 			if self.role:
 				node.instance.iam_instance_profile = None
