@@ -100,7 +100,7 @@ class Substrate():
 
 		if self.is_aws:
 			subprocess.run(
-				f'npx cdk deploy --require-approval never --app "substrate {self.tool_name} -c {self.path} synth"',  # noqa: E501
+				f'npx cdk deploy --require-approval never --app "python -m src.substrate {self.tool_name} -c {self.path} synth"',  # noqa: E501
 				check=True,
 				shell=True
 			)
@@ -132,7 +132,7 @@ class Substrate():
 	def stop(self):
 		if self.is_aws:
 			subprocess.run(
-				f'npx cdk destroy --force --app "substrate {self.tool_name} -c {self.path} synth"',  # noqa: E501
+				f'npx cdk destroy --force --app "python -m src.substrate {self.tool_name} -c {self.path} synth"',  # noqa: E501
 				check=True,
 				shell=True
 			)
