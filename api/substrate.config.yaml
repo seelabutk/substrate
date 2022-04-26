@@ -9,7 +9,7 @@ data:
 
 ### Local deployment
 ### Each node should have Docker Engine installed.
-cluster:
+docker:
   port: OPTIONAL - the port to be expose the Docker service on
   replicas: OPTIONAL - the number of replicas the Docker swarm should use
   advertise_addr: REQUIRED if using multiple local nodes - the IP:PORT to use to add nodes to the swarm

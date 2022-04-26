@@ -1,20 +1,16 @@
 #!/usr/bin/env python3
 from argparse import ArgumentParser
 import os
-import subprocess
 import sys
-from time import sleep
 from urllib.request import urlretrieve
 from urllib.parse import urlparse
 
-from aws_cdk.core import App
-import requests
 import yaml
 
-from .classes import SubstrateStack, SubstrateSwarm
+from .targets import AWSStack, DockerSwarm
 from .tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, VCI
 
-MODULES = {
+TOOLS = {
 	'hello_world': HelloWorld,
 	'nc_slicer': NetCDFSlicer,
 	'ospray_studio': OSPRayStudio,
@@ -28,25 +24,19 @@ class Substrate():
 		self.tool_name = tool_name
 		self.path, self.config = self._parse_yaml(path)
 
-		self.is_aws = self.config.get('aws', None) is not None
-		self.is_local = self.config.get('cluster', None) is not None
+		self.target = None
+		if self.config.get('aws', None) is not None:
+			self.target = AWSStack
+		elif self.config.get('docker', None) is not None:
+			self.target = DockerSwarm
 
 		self.data_sources = self._get_data(self.config)
 
-		if tool_name not in MODULES:
+		if tool_name not in TOOLS:
 			raise Exception(f'No tool named {tool_name}')
-		self.tool = MODULES[tool_name](self.config, self.data_sources)
+		self.tool = TOOLS[tool_name](self.config, self.data_sources)
 
-		if self.is_aws:
-			app = App()
-			SubstrateStack(
-				app,
-				'substrate-stack',
-				self.tool,
-				self.config,
-				self.data_sources[1]
-			)
-			app.synth()
+		self.target_obj = self.target(self.path, self.config, self.tool)
 
 	def _get_data(self, config):
 		source_paths = config['data']['source']
@@ -57,7 +47,7 @@ class Substrate():
 			is_url = urlparse(source_path).scheme.startswith(('ftp', 'http'))
 
 			# Download the dataset if necessary to the target location
-			if is_url and self.is_local:
+			if is_url and self.target == DockerSwarm:
 				target_path = os.path.abspath(config['data']['target'])
 
 				os.makedirs(os.path.dirname(target_path), exist_ok=True)
@@ -90,61 +80,16 @@ class Substrate():
 		with open(path, 'r', encoding='utf8') as stream:
 			_config = yaml.load(stream, Loader=yaml.Loader)
 
-		# TODO: add as much error checking as I have time for
-		if _config.get('cluster', None) and _config.get('aws', None):
-			sys.exit('The "cluster" and "aws" options cannot be used simultaneously.')
+		if _config.get('docker', None) and _config.get('aws', None):
+			sys.exit('The "docker" and "aws" options cannot be used simultaneously.')
 
 		return (path, _config)
 
 	def start(self):
-		location = None
-
-		if self.is_aws:
-			subprocess.run(
-				f'npx cdk deploy --require-approval never --app "python -m src.substrate {self.tool_name} -c {self.path} synth"',  # noqa: E501
-				check=True,
-				shell=True
-			)
-
-			location = subprocess.check_output(
-				'aws ec2 describe-instances --filters Name=instance-state-name,Values=running Name=tag:Name,Values=substrate-stack/substrate-leader --query Reservations[*].Instances[*].[PublicIpAddress] --output text',  # noqa: E501
-				shell=True
-			).strip().decode('utf-8')
-
-			print('The CloudFormation stack has successfully deployed. It may take several minutes before the instance is ready to use.')  # noqa: E501
-			while True:
-				print('Checking if AWS instance is ready…', end='')
-				try:
-					response = requests.get(f'http://{location}')
-					if response.status_code == 200:
-						break
-				except requests.exceptions.ConnectionError:
-					pass
-
-				print("instance isn't ready yet. Trying again in 30 seconds.")
-				sleep(30)
-			print('✓')
-		if self.is_local:
-			swarm = SubstrateSwarm(self.tool, self.config)
-			location = swarm.start()
-
-		return f'http://{location}'
+		return f'http://{self.target_obj.start()}'
 
 	def stop(self):
-		if self.is_aws:
-			subprocess.run(
-				f'npx cdk destroy --force --app "python -m src.substrate {self.tool_name} -c {self.path} synth"',  # noqa: E501
-				check=True,
-				shell=True
-			)
-			subprocess.run(
-				f'aws s3 rm s3://{self.config["aws"]["bucket"]} --recursive',
-				check=True,
-				shell=True
-			)
-		elif self.is_local:
-			swarm = SubstrateSwarm(self.tool, self.config)
-			swarm.stop()
+		self.target_obj.stop()
 
 
 def main():

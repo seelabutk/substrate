@@ -72,7 +72,7 @@ class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 			Mount('/config', self.config_path, type='bind', read_only=True)
 		)
 
-		self.port = self.config['cluster'].get('port', self.port)
+		self.port = self.config['docker'].get('port', self.port)
 		docker.services.create(
 			'evilkermit/substrate_tapestry:latest',
 			'./server',
@@ -81,7 +81,7 @@ class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 			env=['APP_DIR=/app'],
 			mode=ServiceMode(
 				mode='replicated',
-				replicas=self.config['cluster'].get('replicas', 1)
+				replicas=self.config['docker'].get('replicas', 1)
 			),
 			mounts=mounts,
 			name='tapestry',

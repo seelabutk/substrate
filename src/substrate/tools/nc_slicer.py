@@ -29,7 +29,7 @@ class NetCDFSlicer(Tool):
 
 		docker = from_env()
 
-		self.port = self.config['cluster'].get('port', self.port)
+		self.port = self.config['docker'].get('port', self.port)
 		docker.services.create(
 			'npatel79/water-and-land:latest',
 			'flask',
@@ -37,7 +37,7 @@ class NetCDFSlicer(Tool):
 			endpoint_spec=EndpointSpec(ports={self.port: (5000, 'tcp')}),
 			mode=ServiceMode(
 				mode='replicated',
-				replicas=self.config['cluster'].get('replicas', 1)
+				replicas=self.config['docker'].get('replicas', 1)
 			),
 			mounts=mounts,
 			name='nc_slicer',

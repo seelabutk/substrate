@@ -1,12 +1,73 @@
 import os
+import subprocess
+from time import sleep
 
+from aws_cdk.core import App
 import aws_cdk.aws_ec2 as ec2
 import aws_cdk.aws_efs as efs
 import aws_cdk.aws_iam as iam
 from aws_cdk.core import RemovalPolicy, Stack
+import requests
 
 
-class SubstrateStack(Stack):  # pylint: disable=too-many-instance-attributes
+class AWSStack():
+	def __init__(self, path, config, tool):
+		self.path = path
+		self.config = config
+		self.tool = tool
+
+		app = App()
+		_AWSStack(
+			app,
+			'substrate-stack',
+			tool,
+			config,
+			self.tool.data_sources[1]
+		)
+		app.synth()
+
+	def start(self):
+		subprocess.run(
+			f'npx cdk deploy --require-approval never --app "python -m src.substrate {self.tool.name} -c {self.path} synth"',  # noqa: E501
+			check=True,
+			shell=True
+		)
+
+		location = subprocess.check_output(
+			'aws ec2 describe-instances --filters Name=instance-state-name,Values=running Name=tag:Name,Values=substrate-stack/substrate-leader --query Reservations[*].Instances[*].[PublicIpAddress] --output text',  # noqa: E501
+			shell=True
+		).strip().decode('utf-8')
+
+		print('The CloudFormation stack has successfully deployed. It may take several minutes before the instance is ready to use.')  # noqa: E501
+		while True:
+			print('Checking if AWS instance is ready…', end='')
+			try:
+				response = requests.get(f'http://{location}')
+				if response.status_code == 200:
+					break
+			except requests.exceptions.ConnectionError:
+				pass
+
+			print("instance isn't ready yet. Trying again in 30 seconds.")
+			sleep(30)
+		print('✓')
+
+		return location
+
+	def stop(self):
+		subprocess.run(
+			f'npx cdk destroy --force --app "python -m src.substrate {self.tool.name} -c {self.path} synth"',  # noqa: E501
+			check=True,
+			shell=True
+		)
+		subprocess.run(
+			f'aws s3 rm s3://{self.config["aws"]["bucket"]} --recursive',
+			check=True,
+			shell=True
+		)
+
+
+class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 	def __init__(self, scope, _id, tool, config, data_urls, **kwargs):
 		self.tool = tool
 		self.config = config
@@ -42,11 +103,6 @@ class SubstrateStack(Stack):  # pylint: disable=too-many-instance-attributes
 			self.role = iam.Role.from_role_arn(self, 'john', role_arn, mutable=False)
 		else:
 			self.role = None
-
-		scripts_dir = os.path.join(os.path.dirname(__file__), 'scripts')
-		udata_file = os.path.join(scripts_dir, 'node.sh')
-		with open(udata_file, 'r', encoding='utf-8') as commands:
-			self.global_commands = commands.read()
 
 		self.file_system = self.provision_fs()
 		self.provision_ec2()

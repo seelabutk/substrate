@@ -8,7 +8,7 @@ class HelloWorld(Tool):
 	def __init__(self, config, data_sources):
 		super().__init__(config, data_sources)
 
-		self.name = 'hello-world'
+		self.name = 'hello_world'
 		self.port = 8000
 
 		self.config = config
@@ -16,7 +16,7 @@ class HelloWorld(Tool):
 
 		self.service_command = (
 			'docker service create '
-			'--name hello-world '
+			'--name hello_world '
 			'--publish 80:5000/tcp '
 			f'--replicas {self.config.get("aws", {}).get("replicas", 1)} '
 			'--mount type=bind,src=/mnt/efs/data,dst=/data '
@@ -29,7 +29,7 @@ class HelloWorld(Tool):
 
 		docker = from_env()
 
-		self.port = self.config['cluster'].get('port', self.port)
+		self.port = self.config['docker'].get('port', self.port)
 		docker.services.create(
 			'evilkermit/substrate-hello-world:latest',
 			'python3',
@@ -37,9 +37,9 @@ class HelloWorld(Tool):
 			endpoint_spec=EndpointSpec(ports={self.port: (8000, 'tcp')}),
 			mode=ServiceMode(
 				mode='replicated',
-				replicas=self.config['cluster'].get('replicas', 1)
+				replicas=self.config['docker'].get('replicas', 1)
 			),
 			mounts=mounts,
-			name='hello-world',
-			networks=['substrate-hello-world-net']
+			name='hello_world',
+			networks=['substrate-hello_world-net']
 		)

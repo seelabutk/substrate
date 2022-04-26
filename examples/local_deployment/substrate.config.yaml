@@ -3,6 +3,6 @@ data:
     - ../data/apple
 
 
-cluster:
+docker:
   port: 8000
   replicas: 3

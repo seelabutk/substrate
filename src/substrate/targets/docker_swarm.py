@@ -7,10 +7,10 @@ from docker import from_env
 import paramiko
 
 
-class SubstrateSwarm():
-	def __init__(self, tool, config):
-		self.tool = tool
+class DockerSwarm():
+	def __init__(self, _, config, tool):
 		self.config = config
+		self.tool = tool
 
 		self.docker = from_env()
 		self.network = None
@@ -23,7 +23,7 @@ class SubstrateSwarm():
 
 	def create_swarm(self):
 		self.log('Initializing the swarm…')
-		advertise_addr = self.config['cluster'].get('advertise_addr', None)
+		advertise_addr = self.config['docker'].get('advertise_addr', None)
 		if advertise_addr:
 			self.docker.swarm.init(advertise_addr=advertise_addr)
 		else:
@@ -39,9 +39,9 @@ class SubstrateSwarm():
 		worker_token = self.docker.swarm.attrs['JoinTokens']['Worker']
 
 		nodes = []
-		for node in self.config['cluster'].get('managers', []):
+		for node in self.config['docker'].get('managers', []):
 			nodes.append(('manager', node))
-		for node in self.config['cluster'].get('workers', []):
+		for node in self.config['docker'].get('workers', []):
 			nodes.append(('worker', node))
 
 		for node_type, node in nodes:
@@ -93,9 +93,9 @@ class SubstrateSwarm():
 
 	def destroy_swarm(self):
 		nodes = []
-		for node in self.config['cluster'].get('managers', []):
+		for node in self.config['docker'].get('managers', []):
 			nodes.append(node)
-		for node in self.config['cluster'].get('workers', []):
+		for node in self.config['docker'].get('workers', []):
 			nodes.append(node)
 
 		for node in nodes:

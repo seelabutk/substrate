@@ -44,7 +44,7 @@ class VCI(Tool):
 
 		mounts.append(Mount('/opt/run', self.vci_path, type='bind', read_only=True))
 
-		self.port = self.config['cluster'].get('port', self.port)
+		self.port = self.config['docker'].get('port', self.port)
 		docker.services.create(
 			'evilkermit/substrate_vci:latest',
 			'python3.7',
@@ -56,7 +56,7 @@ class VCI(Tool):
 			],
 			mode=ServiceMode(
 				mode='replicated',
-				replicas=self.config['cluster'].get('replicas', 1)
+				replicas=self.config['docker'].get('replicas', 1)
 			),
 			mounts=mounts,
 			name='VCI',
