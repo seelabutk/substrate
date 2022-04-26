@@ -43,6 +43,7 @@ or via Python using
 	stack.stop()
 
 Valid tool names:
+- hello_world (this will just host the provided data sources as static files)
 - nc_slicer
 - ospray_studio
 - tapestry
