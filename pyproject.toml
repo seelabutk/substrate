@@ -17,7 +17,7 @@ dependencies = [
 ]
 description = "Automatically deploys visualization services via Docker Swarm"
 entry-points = {console_scripts = {substrate = "substrate.substrate:main"}}
-license = {file = "LICENSE"}
+license = {text = "CC-BY-4.0"}
 readme = "README.md"
 requires-python = ">=3.7"
 version = "0.20"
