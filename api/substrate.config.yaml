@@ -28,6 +28,7 @@ aws:
   region: REQUIRED - the region to deploy to
   replicas: OPTIONAL - the number of replicas the Docker swarm should use
   role_arn: REQUIRED if you don't have access to create IAM roles - the role ARN of the IAM role you want to use to deploy
+  save_logs: OPTIONAL - sync the EC2 leader's cloud-init logs to S3 after each command
   managers: REQUIRED - list of the type and count of EC2 instances to use as managers
     't3.micro': 1
   workers: OPTIONAL - list of the type and count of EC2 instances to use as workers

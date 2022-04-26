@@ -51,10 +51,17 @@ class SubstrateStack(Stack):  # pylint: disable=too-many-instance-attributes
 		self.file_system = self.provision_fs()
 		self.provision_ec2()
 
+	def add_leader_commands(self, udata, *args):
+		for command in args:
+			udata.add_commands(command)
+
+		if self.config['aws'].get('save_logs', False):
+			udata.add_commands(f'aws s3 sync /var/log s3://{self.config["aws"]["bucket"]}/logs')  # noqa: E501
+
 	def get_udata(self, _type):
 		udata = ec2.UserData.for_linux()
-		# TODO: Is there a better way to give access to each node to use AWS CLI?
-		udata.add_commands(
+		self.add_leader_commands(
+			udata,
 			f'export AWS_DEFAULT_REGION={self.config["aws"].get("region", "us-east-1")}',  # noqa: E501
 			f'export AWS_ACCESS_KEY_ID={os.environ.get("AWS_ACCESS_KEY_ID")}',
 			f'export AWS_SECRET_ACCESS_KEY={os.environ.get("AWS_SECRET_ACCESS_KEY")}',
@@ -69,39 +76,33 @@ class SubstrateStack(Stack):  # pylint: disable=too-many-instance-attributes
 			'sudo yum install -y python3',
 			'sudo mkdir -p "/mnt/efs"',
 			f'test -f "/sbin/mount.efs" && echo "{self.file_system.file_system_id}:/ /mnt/efs efs defaults,_netdev" >> /etc/fstab || echo "{self.file_system.file_system_id}.efs.{self.config["aws"].get("region", "us-east-1")}.amazonaws.com:/ /mnt/efs nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab',  # noqa: E501
-			'mount -a -t efs,nfs4 defaults',
-			f'aws s3 sync /var/log s3://{self.config["aws"]["bucket"]}/logs'
+			'mount -a -t efs,nfs4 defaults'
 		)
 
 		if _type == 'leader':
-			udata.add_commands('sudo mkdir -p /etc/pki/tls/private')
-			udata.add_commands('cd /etc/pki/tls/private')
-			udata.add_commands(
-				'sudo openssl req -x509 -newkey rsa:4096 -nodes '
-				'-out cert.pem -keyout key.pem -days 365 '
-				'-subj "/C=US/ST=Tennessee/L=Knoxville/O=University of Tennessee/OU=Seelab/CN=github.com\/seelabutk"'  # pylint: disable=anomalous-backslash-in-string # noqa: E501,W605
+			self.add_leader_commands(
+				udata,
+				'sudo mkdir -p /etc/pki/tls/private',
+				'cd /etc/pki/tls/private',
+				'sudo openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365 -subj "/C=US/ST=Tennessee/L=Knoxville/O=University of Tennessee/OU=Seelab/CN=github.com\/seelabutk"'  # pylint: disable=anomalous-backslash-in-string # noqa: E501,W605
 			)
-			udata.add_commands(f'aws s3 sync /var/log s3://{self.config["aws"]["bucket"]}/logs')  # noqa: E501
-			udata.add_commands(
-				f'aws s3 sync s3://{self.config["aws"]["bucket"]} /mnt/efs'
+
+			self.add_leader_commands(
+				udata,
+				f'aws s3 sync s3://{self.config["aws"]["bucket"]} /mnt/efs',
+				'cd /mnt/efs/data',
+				*[f'curl -O {data_url}' for data_url in self.data_urls],
+				'cd -'
 			)
-			udata.add_commands(f'aws s3 sync /var/log s3://{self.config["aws"]["bucket"]}/logs')  # noqa: E501
-			udata.add_commands('cd /data')
-			for data_url in self.data_urls:
-				udata.add_commands(f'curl -O {data_url}')
-			udata.add_commands('cd -')
-			udata.add_commands('mkdir /mnt/efs/swarm')
-			udata.add_commands(f'aws s3 sync /var/log s3://{self.config["aws"]["bucket"]}/logs')  # noqa: E501
-			udata.add_commands('docker swarm init')
-			udata.add_commands(
-				'docker swarm join-token worker | grep "docker" > /mnt/efs/swarm/worker'
+
+			self.add_leader_commands(
+				udata,
+				'mkdir /mnt/efs/swarm',
+				'docker swarm init',
+				'docker swarm join-token worker | grep "docker" > /mnt/efs/swarm/worker',
+				'docker swarm join-token manager | grep "docker" > /mnt/efs/swarm/manager',
+				self.tool.service_command
 			)
-			udata.add_commands(
-				'docker swarm join-token manager | grep "docker" > /mnt/efs/swarm/manager'
-			)
-			udata.add_commands(f'aws s3 sync /var/log s3://{self.config["aws"]["bucket"]}/logs')  # noqa: E501
-			udata.add_commands(self.tool.service_command)
-			udata.add_commands(f'aws s3 sync /var/log s3://{self.config["aws"]["bucket"]}/logs')  # noqa: E501
 		elif _type == 'manager':
 			udata.add_commands('until [ -f /mnt/efs/swarm/manager ]; do sleep 1; done')
 			udata.add_commands('$(cat /mnt/efs/swarm/manager)')
