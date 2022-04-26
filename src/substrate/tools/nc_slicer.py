@@ -4,11 +4,11 @@ from docker.types.services import EndpointSpec, ServiceMode
 from . import Tool
 
 
-class DCHM(Tool):
+class NetCDFSlicer(Tool):
 	def __init__(self, config, data_sources):
 		super().__init__(config, data_sources)
 
-		self.name = 'dchm'
+		self.name = 'nc-slicer'
 		self.port = 8000
 
 		self.config = config
@@ -40,6 +40,6 @@ class DCHM(Tool):
 				replicas=self.config['cluster'].get('replicas', 1)
 			),
 			mounts=mounts,
-			name='dchm',
-			networks=['substrate-dchm-net']
+			name='nc_slicer',
+			networks=['substrate-nc-slicer-net']
 		)

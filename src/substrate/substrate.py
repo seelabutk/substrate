@@ -12,10 +12,10 @@ import requests
 import yaml
 
 from .classes import SubstrateStack, SubstrateSwarm
-from .tools import DCHM, OSPRayStudio, Tapestry, VCI
+from .tools import NetCDFSlicer, OSPRayStudio, Tapestry, VCI
 
 MODULES = {
-	'dchm': DCHM,
+	'nc_slicer': NetCDFSlicer,
 	'ospray_studio': OSPRayStudio,
 	'tapestry': Tapestry,
 	'vci': VCI
@@ -151,7 +151,7 @@ def main():
 
 	parser.add_argument(
 		'tool',
-		help='The visualization tool to run [dchm, ospray_studio, tapestry, vci]',
+		help='The visualization tool to run [nc_slicer, ospray_studio, tapestry, vci]',  # noqa: E501
 		metavar='TOOL'
 	)
 	parser.add_argument(

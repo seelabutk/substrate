@@ -4,6 +4,7 @@ Substrate is a tool that allows you to automate the process of deploying visuali
 
 ### Supported Visualization tools
 
+- NetCDF Slicer
 - [OSPRay Studio](https://github.com/ospray/ospray_studio)
 - [Volume Rendering via Tapestry](https://github.com/seelabutk/tapestry)
 - [Flow Visualization via VCI](https://bitbucket.org/seelabutk/vci)
@@ -42,6 +43,7 @@ or via Python using
 	stack.stop()
 
 Valid tool names:
+- nc_slicer
 - ospray_studio
 - tapestry
 - vci
@@ -61,6 +63,7 @@ The options for the configuration file can be found [here](api/substrate.config.
 Each tool has static files that are needed to run it. Defaults are provided, but if needed or desired they can be modified. Here are links to get the default files for [Tapestry](src/substrate/tapestry) and [VCI](src/substrate/vci).
 
 For more information on configuring each tool, please refer to each tools documentation:
+- NetCDF Slicer: coming soon
 - [OSPRay Studio](https://github.com/ospray/ospray_studio)
 - [Tapestry](https://github.com/seelabutk/tapestry)
 - [VCI](https://bitbucket.org/seelabutk/vci)
