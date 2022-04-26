@@ -1,8 +1,0 @@
-data:
-  source:
-    - /path/to/your/dataset
-
-
-cluster:
-  port: 8000
-  replicas: 3

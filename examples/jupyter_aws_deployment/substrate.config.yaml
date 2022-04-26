@@ -1,0 +1,11 @@
+data:
+  source:
+    - ../data/apple
+
+
+aws:
+  bucket: your-unique-bucket-name
+  region: us-east-1
+  save_logs: true
+  managers:
+    't3.medium': 1

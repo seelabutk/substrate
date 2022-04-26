@@ -1,5 +1,5 @@
 [submodule "sample_projects/substrate:ospray-studio"]
-	path = sample_projects/substrate:ospray-studio
+	path = examples/sample_projects/substrate:ospray-studio
 	url = https://github.com/seelabutk/substrate-ospray-studio
 [submodule "frontends/jupyter"]
 	path = frontends/jupyter

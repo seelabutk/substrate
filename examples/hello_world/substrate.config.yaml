@@ -1,0 +1,8 @@
+data:
+  source:
+    - ../data/apple
+
+
+cluster:
+  port: 8000
+  replicas: 1

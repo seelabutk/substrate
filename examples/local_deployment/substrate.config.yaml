@@ -1,6 +1,6 @@
 data:
   source:
-    - /path/to/your/dataset
+    - ../data/apple
 
 
 cluster:
