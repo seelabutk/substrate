@@ -23,7 +23,7 @@ This tool relies upon Docker Swarm. In order for it to work, the following assum
 - The ports needed by Docker Swarm must be open for communication between nodes. Please review the [Docker Swarm docs](https://docs.docker.com/engine/swarm/) for more information.
 - You must be able to connect to each node over SSH with a private key available in `~/.ssh`.
 
-### Getting Started (none of this works yet)
+### Getting Started
 
 To install run
 
