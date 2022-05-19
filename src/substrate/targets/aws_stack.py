@@ -2,11 +2,10 @@ import os
 import subprocess
 from time import sleep
 
-from aws_cdk.core import App
-import aws_cdk.aws_ec2 as ec2
-import aws_cdk.aws_efs as efs
-import aws_cdk.aws_iam as iam
-from aws_cdk.core import RemovalPolicy, Stack
+from aws_cdk import App, RemovalPolicy, Stack
+from aws_cdk import aws_ec2 as ec2
+from aws_cdk import aws_efs as efs
+from aws_cdk import aws_iam as iam
 import requests
 
 
@@ -27,6 +26,12 @@ class AWSStack():
 		app.synth()
 
 	def start(self):
+		subprocess.run(
+			f'npx cdk bootstrap --app "substrate {self.tool.name} -c {self.path} synth"',  # noqa: E501
+			check=True,
+			shell=True
+		)
+
 		subprocess.run(
 			f'npx cdk deploy --require-approval never --app "substrate {self.tool.name} -c {self.path} synth"',  # noqa: E501
 			check=True,

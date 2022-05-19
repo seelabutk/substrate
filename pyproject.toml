@@ -6,10 +6,8 @@ classifiers = [
 	"Operating System :: OS Independent"
 ]
 dependencies = [
-	'aws-cdk.core ~= 1.147.0',
-	'aws-cdk.aws-ec2 ~= 1.147.0',
-	'aws-cdk.aws-efs ~= 1.147.0',
-	'aws-cdk.aws-iam ~= 1.147.0',
+	'aws-cdk-lib ~= 2.24.1',
+	'constructs ~= 10.1.11',
 	'docker ~= 5.0.3',
 	'paramiko ~= 2.9.2',
 	'PyYAML ~= 6.0',
@@ -20,7 +18,7 @@ entry-points = {console_scripts = {substrate = "substrate.substrate:main"}}
 license = {text = "CC-BY-4.0"}
 readme = "README.md"
 requires-python = ">=3.7"
-version = "1.0.2"
+version = "1.1.0"
 
 [project.urls]
 Homepage = "https://github.com/seelabutk/substrate/"
