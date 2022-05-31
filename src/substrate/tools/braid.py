@@ -8,19 +8,19 @@ from docker.types.services import EndpointSpec, ServiceMode
 from . import Tool
 
 
-class VCI(Tool):
+class Braid(Tool):
 	def __init__(self, config, data_sources):
 		super().__init__(config, data_sources)
 
-		self.name = 'vci'
+		self.name = 'braid'
 		self.config = config
 		self.port = 8000
 
-		self.vci_pattern = self.config['vci']['file_pattern']
+		self.braid_pattern = self.config['braid']['file_pattern']
 
 		self.service_command = (
 			'docker service create '
-			f'--env VCI_PATTERN={self.vci_pattern} '
+			f'--env VCI_PATTERN={self.braid_pattern} '
 			'--env VCI_ROOT=/data '
 			'--name tapestry '
 			'--publish 80:8840/tcp '
@@ -32,9 +32,9 @@ class VCI(Tool):
 			'python3.7 -u -m vci'
 		)
 
-		fallback_dir = os.path.join(os.path.dirname(__file__), 'vci')
+		fallback_dir = os.path.join(os.path.dirname(__file__), 'braid')
 
-		self.vci_path = self.config['vci'].get('directory', fallback_dir)
+		self.braid_path = self.config['braid'].get('directory', fallback_dir)
 		self.data_sources = data_sources
 
 	def start(self):
@@ -42,7 +42,9 @@ class VCI(Tool):
 
 		docker = from_env()
 
-		mounts.append(Mount('/opt/run', self.vci_path, type='bind', read_only=True))
+		mounts.append(
+			Mount('/opt/run', self.braid_path, type='bind', read_only=True)
+		)
 
 		self.port = self.config['docker'].get('port', self.port)
 		docker.services.create(
@@ -51,7 +53,7 @@ class VCI(Tool):
 			args=['-u', '-m', 'vci'],
 			endpoint_spec=EndpointSpec(ports={self.port: (8840, 'tcp')}),
 			env=[
-				f'VCI_PATTERN={self.vci_pattern}',
+				f'VCI_PATTERN={self.braid_pattern}',
 				'VCI_ROOT=/data'
 			],
 			mode=ServiceMode(
@@ -59,8 +61,8 @@ class VCI(Tool):
 				replicas=self.config['docker'].get('replicas', 1)
 			),
 			mounts=mounts,
-			name='VCI',
-			networks=['substrate-vci-net'],
+			name='braid',
+			networks=['substrate-braid-net'],
 			workdir='/opt/run'
 		)
 
@@ -68,7 +70,7 @@ class VCI(Tool):
 		super().upload_to_s3()
 
 		subprocess.run(
-			f'aws s3 sync {self.vci_path} s3://{self.config["aws"]["bucket"]}/app',
+			f'aws s3 sync {self.braid_path} s3://{self.config["aws"]["bucket"]}/app',
 			check=True,
 			shell=True
 		)

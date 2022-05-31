@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import subprocess
+import sys
 import time
 
 from docker import from_env
@@ -125,6 +126,7 @@ class DockerSwarm():
 
 	def log(self, message):
 		print(message, end='')
+		sys.stdout.flush()
 
 	def start(self):
 		return self.create_swarm()

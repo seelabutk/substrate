@@ -43,6 +43,6 @@ tapestry:
   directory: OPTIONAL - directory containing files needed for Tapestry to run
   filename: REQUIRED - the filename of the data file to be rendered
 
-vci:
+braid:
   directory: OPTIONAL - directory containing files needed for VCI to run
   file_pattern: REQUIRED - a file pattern that describes all of the data files

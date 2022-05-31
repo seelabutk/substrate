@@ -8,14 +8,14 @@ from urllib.parse import urlparse
 import yaml
 
 from .targets import AWSStack, DockerSwarm
-from .tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, VCI
+from .tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid
 
 TOOLS = {
 	'hello_world': HelloWorld,
 	'nc_slicer': NetCDFSlicer,
 	'ospray_studio': OSPRayStudio,
 	'tapestry': Tapestry,
-	'vci': VCI
+	'braid': Braid
 }
 
 
@@ -97,7 +97,7 @@ def main():
 
 	parser.add_argument(
 		'tool',
-		help='The visualization tool to run [hello_world, nc_slicer, ospray_studio, tapestry, vci]',  # noqa: E501
+		help='The visualization tool to run [hello_world, nc_slicer, ospray_studio, tapestry, braid]',  # noqa: E501
 		metavar='TOOL'
 	)
 	parser.add_argument(

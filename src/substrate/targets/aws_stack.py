@@ -43,7 +43,8 @@ class AWSStack():
 			shell=True
 		).strip().decode('utf-8')
 
-		print('The CloudFormation stack has successfully deployed. It may take several minutes before the instance is ready to use.')  # noqa: E501
+		print('The CloudFormation stack has successfully deployed.')  # noqa: E501
+		print('\033[91mIt may take several minutes before the instance is ready to use, please wait while the instance starts.\033[0m')  # noqa: E501
 		while True:
 			print('Checking if AWS instance is ready…', end='')
 			try:
@@ -137,7 +138,8 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 			'sudo yum install -y python3',
 			'sudo mkdir -p "/mnt/efs"',
 			f'test -f "/sbin/mount.efs" && echo "{self.file_system.file_system_id}:/ /mnt/efs efs defaults,_netdev" >> /etc/fstab || echo "{self.file_system.file_system_id}.efs.{self.config["aws"].get("region", "us-east-1")}.amazonaws.com:/ /mnt/efs nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab',  # noqa: E501
-			'mount -a -t efs,nfs4 defaults'
+			'mount -a -t efs,nfs4 defaults',
+			'until mountpoint -d /mnt/efs; do mount -a -t efs,nfs4 defaults; done'
 		)
 
 		if _type == 'leader':
