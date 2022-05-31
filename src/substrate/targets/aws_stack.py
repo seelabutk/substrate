@@ -27,13 +27,13 @@ class AWSStack():
 
 	def start(self):
 		subprocess.run(
-			f'npx cdk bootstrap --app "substrate {self.tool.name} -c {self.path} synth"',  # noqa: E501
+			f'npx cdk bootstrap --app "python -m src.substrate {self.tool.name} -c {self.path} synth"',  # noqa: E501
 			check=True,
 			shell=True
 		)
 
 		subprocess.run(
-			f'npx cdk deploy --require-approval never --app "substrate {self.tool.name} -c {self.path} synth"',  # noqa: E501
+			f'npx cdk deploy --require-approval never --app "python -m src.substrate {self.tool.name} -c {self.path} synth"',  # noqa: E501
 			check=True,
 			shell=True
 		)
@@ -43,7 +43,8 @@ class AWSStack():
 			shell=True
 		).strip().decode('utf-8')
 
-		print('The CloudFormation stack has successfully deployed. It may take several minutes before the instance is ready to use.')  # noqa: E501
+		print('The CloudFormation stack has successfully deployed.')  # noqa: E501
+		print('\033[91mIt may take several minutes before the instance is ready to use, please wait while the instance starts.\033[0m')  # noqa: E501
 		while True:
 			print('Checking if AWS instance is ready…', end='')
 			try:
@@ -61,7 +62,7 @@ class AWSStack():
 
 	def stop(self):
 		subprocess.run(
-			f'npx cdk destroy --force --app "substrate {self.tool.name} -c {self.path} synth"',  # noqa: E501
+			f'npx cdk destroy --force --app "python -m src.substrate {self.tool.name} -c {self.path} synth"',  # noqa: E501
 			check=True,
 			shell=True
 		)
