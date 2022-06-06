@@ -7,8 +7,8 @@ from urllib.parse import urlparse
 
 import yaml
 
-from .targets import AWSStack, DockerSwarm
-from .tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid
+from targets import AWSStack, DockerSwarm
+from tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid
 
 TOOLS = {
 	'hello_world': HelloWorld,
@@ -113,8 +113,9 @@ def main():
 
 	substrate = Substrate(args.tool, args.path)
 	if args.action == 'start':
-		print(
-			f'You may view your new visualization stack here: {substrate.start()}.'
-		)
+            print(f'You may view your new visualization stack here: {substrate.start()}.')
 	if args.action == 'stop':
 		substrate.stop()
+
+if __name__ == "__main__": 
+	main()
