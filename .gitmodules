@@ -3,5 +3,5 @@
 	url = https://github.com/seelabutk/substrate-ospray-studio
 [submodule "src/substrate/tools/nc_slicer"]
 	path = src/substrate/tools/nc_slicer
-	url = git@github.com:grsmgis/Water-and-Land.git
+	url = https://github.com/grsmgis/Water-and-Land
 	branch = substrate
