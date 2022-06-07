@@ -20,43 +20,16 @@ class NetCDFSlicer(Tool):
 			'--publish 80:5000/tcp '
 			f'--replicas {self.config.get("aws", {}).get("replicas", 1)} '
 			'--mount type=bind,src=/mnt/efs/data,dst=/data '
-			'npatel79/water-and-land:latest '
+			'jhammer3/substrate:nc_slicer'
 			'python app.py'
 		)
 
 	def start(self):
 		mounts = super().start()
-
 		docker = from_env()
 
-		""" self.port = self.config['docker'].get('port', self.port)
 		docker.services.create(
-			"rlim_test:latest",
-			mode=ServiceMode(
-				mode='replicated',
-				replicas=self.config['docker'].get('replicas', 1)
-			),
-			name='nc_slicer',
-			networks=['substrate-nc_slicer-net'],
-			init=True
-		) """
-		""" docker.services.create(
-			'npatel79/water-and-land:latest',
-			'flask',
-			args=['run', '--host=0.0.0.0'],
-			endpoint_spec=EndpointSpec(ports={self.port: (5000, 'tcp')}),
-			mode=ServiceMode(
-				mode='replicated',
-				replicas=self.config['docker'].get('replicas', 1)
-			),
-			mounts=mounts,
-			name='nc_slicer',
-			networks=['substrate-nc_slicer-net'],
-			init=True
-		) """
-
-		docker.services.create(
-			'nc_slicer',
+			'jhammer3/substrate:nc_slicer',
 			endpoint_spec=EndpointSpec(ports={self.port: (5000, 'tcp')}),
 			mode=ServiceMode(
 				mode='replicated',
