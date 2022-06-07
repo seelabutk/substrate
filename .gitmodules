@@ -1,7 +1,8 @@
 [submodule "sample_projects/substrate:ospray-studio"]
 	path = examples/sample_projects/substrate:ospray-studio
 	url = https://github.com/seelabutk/substrate-ospray-studio
-[submodule "src/substrate/tools/nc_slicer"]
+	branch = main
+[submodule "src/substrate/tools/Water-and-Land"]
 	path = src/substrate/tools/nc_slicer
-	url = https://github.com/grsmgis/Water-and-Land
+	url = git@github.com:grsmgis/Water-and-Land.git
 	branch = substrate
