@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></link>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCHM</title>
+    <script src="{{ url_for('static', filename='js/render.js') }}"></script>
+</head>
+<body>
+  <div class="header">
+    <h1>Render DCHM</h1>
+  </div>
+  <div class="form">
+      <label for="region">Basin: </label>
+      
+      <select name="basin" id="basin">
+          <option value="PRB">PRB</option>
+          <option value="LTTB">LTTB</option>
+          <option value="LFBB" selected>LFBB</option>
+          <option value="LPRB">LPRB</option>
+        </select>
+      <label for="varname">Variable:</label>
+      
+      <select name="vname" id="varname"></select>
+      <label for="date">Date:</label>
+      <input type="date" id="date" name="date" min="2016-08-01" max="2019-12-31" value = "2016-08-01">
+      <label for="hour">Hour:</label>
+      <input type="number" id="hour" name="hour" min="1" max="24" value="1">
+  
+  </div>
+  <div class="done"></div>
+  <button class="button render-btn" onclick="render()">Render</button>
+  <img class="render" id="renderedimg" ></img>
+  
+  <iframe style="display:none" name="hidden-form"></iframe>
+
+
+</body>
+<script>
+
+	
+
+	document.getElementById('basin').onchange = () => {	
+		getVariableNames(document.getElementById("basin").value).then((data) => {
+			fillOptions(document.getElementById('varname'), data);
+		});
+	}
+
+	function getVariableNames(path){
+		const body = {
+			ncpath: path
+		};
+		return fetch('/getVariableNames', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(body),
+		}).then(res => res.json());
+	}
+
+	function fillOptions(el, optionsList){
+		while(el.options.length) el.remove(0);
+		optionsList.forEach(optionText => {
+			const option = document.createElement('option');
+			option.text = optionText.replaceAll('_', ' ');
+			option.value = optionText;
+			el.appendChild(option);
+		});
+	}
+	window.onload = () => {
+		getVariableNames(document.getElementById("basin").value).then((data) => {
+			fillOptions(document.getElementById('varname'), data);
+		});
+	}
+</script>
+</html>
