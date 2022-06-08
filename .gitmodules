@@ -6,3 +6,7 @@
 	path = src/substrate/tools/nc_slicer
 	url = git@github.com:grsmgis/Water-and-Land.git
 	branch = substrate
+[submodule "src/substrate/tools/vci"]
+	path = src/substrate/tools/braid
+	url = git@bitbucket.org:seelabutk/vci.git
+	branch = substrate
