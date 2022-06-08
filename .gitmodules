@@ -14,3 +14,7 @@
 	path = src/substrate/tools/ospray_studio
 	url = git@github.com:seelabutk/substrate-ospray-studio.git
 	branch = substrate
+[submodule "src/substrate/tools/tapestry"]
+	path = src/substrate/tools/tapestry
+	url = git@github.com:seelabutk/tapestry.git
+	branch = substrate
