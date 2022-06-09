@@ -31,7 +31,6 @@ class Substrate():
 			self.target = DockerSwarm
 
 		self.data_sources = self._get_data(self.config)
-
 		if tool_name not in TOOLS:
 			raise Exception(f'No tool named {tool_name}')
 		self.tool = TOOLS[tool_name](self.config, self.data_sources)
