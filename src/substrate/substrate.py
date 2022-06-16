@@ -112,9 +112,7 @@ def main():
 
 	substrate = Substrate(args.tool, args.path)
 	if args.action == 'start':
-            print(f'You may view your new visualization stack here: {substrate.start()}.')
+		print(f'You may view your new visualization stack here: {substrate.start()}.')  # noqa: E501
+
 	if args.action == 'stop':
 		substrate.stop()
-
-if __name__ == "__main__": 
-	main()
