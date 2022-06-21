@@ -34,7 +34,7 @@ class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 
 		fallback_dir = os.path.join(os.path.dirname(__file__), 'tapestry')
 
-		self.tapestry_path = self.config['tapestry'].get('directory', fallback_dir)
+		self.tapestry_path = self.config['tapestry'].get('directory', [fallback_dir])[0]  # noqa: E501
 		self.app_path = os.path.join(self.tapestry_path, 'app')
 		self.config_path = os.path.join(self.tapestry_path, 'config')
 		self.data_sources = data_sources
@@ -58,10 +58,10 @@ class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 				tapestry_config['dimensions'][-1] * 2
 			]
 
-		# Save the config so it can be changed by the user
-		if new_config != tapestry_config:
-			with open(config_file, 'w', encoding='utf8') as _file:
-				json.dump(new_config, _file)
+			# Save the config so it can be changed by the user
+			if new_config != tapestry_config:
+				with open(config_file, 'w', encoding='utf8') as _file:
+					json.dump(new_config, _file)
 
 	def start(self):
 		mounts = super().start()

@@ -7,8 +7,8 @@ from urllib.parse import urlparse
 
 import yaml
 
-from .targets import AWSStack, DockerSwarm
-from .tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid
+from targets import AWSStack, DockerSwarm
+from tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid
 
 TOOLS = {
 	'hello_world': HelloWorld,
@@ -31,7 +31,6 @@ class Substrate():
 			self.target = DockerSwarm
 
 		self.data_sources = self._get_data(self.config)
-
 		if tool_name not in TOOLS:
 			raise Exception(f'No tool named {tool_name}')
 		self.tool = TOOLS[tool_name](self.config, self.data_sources)
@@ -113,8 +112,7 @@ def main():
 
 	substrate = Substrate(args.tool, args.path)
 	if args.action == 'start':
-		print(
-			f'You may view your new visualization stack here: {substrate.start()}.'
-		)
+		print(f'You may view your new visualization stack here: {substrate.start()}.')  # noqa: E501
+
 	if args.action == 'stop':
 		substrate.stop()

@@ -8,7 +8,7 @@ class NetCDFSlicer(Tool):
 	def __init__(self, config, data_sources):
 		super().__init__(config, data_sources)
 
-		self.name = 'nc-slicer'
+		self.name = 'nc_slicer'
 		self.port = 8000
 
 		self.config = config
@@ -20,20 +20,16 @@ class NetCDFSlicer(Tool):
 			'--publish 80:5000/tcp '
 			f'--replicas {self.config.get("aws", {}).get("replicas", 1)} '
 			'--mount type=bind,src=/mnt/efs/data,dst=/data '
-			'npatel79/water-and-land:latest '
-			'flask run --host=0.0.0.0'
+			'jhammer3/substrate:nc_slicer'
+			'python app.py'
 		)
 
 	def start(self):
 		mounts = super().start()
-
 		docker = from_env()
 
-		self.port = self.config['docker'].get('port', self.port)
 		docker.services.create(
-			'npatel79/water-and-land:latest',
-			'flask',
-			args=['run', '--host=0.0.0.0'],
+			'jhammer3/substrate:nc_slicer',
 			endpoint_spec=EndpointSpec(ports={self.port: (5000, 'tcp')}),
 			mode=ServiceMode(
 				mode='replicated',
@@ -41,5 +37,12 @@ class NetCDFSlicer(Tool):
 			),
 			mounts=mounts,
 			name='nc_slicer',
-			networks=['substrate-nc-slicer-net']
+			networks=['substrate-nc_slicer-net'],
+			init=True
 		)
+
+	# TODO: 
+	# fix nc-slicer -> nc_slicer and init=True in main substrate repo
+	# set up dockerhub org and move images to it
+	# impliment water-and-land changes to nc_slicer image 
+
