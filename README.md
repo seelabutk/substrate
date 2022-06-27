@@ -68,3 +68,10 @@ For more information on configuring each tool, please refer to each tools docume
 - [OSPRay Studio](https://github.com/ospray/ospray_studio)
 - [Tapestry](https://github.com/seelabutk/tapestry)
 - [Braid](https://bitbucket.org/seelabutk/vci)
+
+### Uploading to PyPI
+
+To upload to prepare a new release, run the following commands:
+
+	python -m build
+	python -m twine upload dist/*
