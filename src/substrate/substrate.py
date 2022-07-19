@@ -7,8 +7,8 @@ from urllib.parse import urlparse
 
 import yaml
 
-from targets import AWSStack, DockerSwarm
-from tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid
+from .targets import AWSStack, DockerSwarm
+from .tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid
 
 TOOLS = {
 	'hello_world': HelloWorld,
