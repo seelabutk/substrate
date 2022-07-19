@@ -117,8 +117,8 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 		for command in args:
 			udata.add_commands(command)
 
-		if self.config['aws'].get('save_logs', False):
-			udata.add_commands(f'aws s3 sync /var/log s3://{self.config["aws"]["bucket"]}/logs')  # noqa: E501
+			if self.config['aws'].get('save_logs', True):
+				udata.add_commands(f'aws s3 sync /var/log s3://{self.config["aws"]["bucket"]}/logs')  # noqa: E501
 
 	def get_udata(self, _type):
 		udata = ec2.UserData.for_linux()
