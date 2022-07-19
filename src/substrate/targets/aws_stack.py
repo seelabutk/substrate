@@ -18,7 +18,7 @@ class AWSStack():
 		app = App()
 		_AWSStack(
 			app,
-			'substrate-stack',
+			f'substrate-stack-{self.tool.name}',
 			tool,
 			config,
 			self.tool.data_sources[1]
