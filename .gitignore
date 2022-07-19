@@ -3,3 +3,4 @@ node_modules
 cdk.out
 *.egg-info
 dist
+substrate.config.yaml
