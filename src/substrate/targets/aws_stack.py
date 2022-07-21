@@ -1,6 +1,5 @@
 import os
 import subprocess
-import sys
 from time import sleep
 
 from aws_cdk import App, RemovalPolicy, Stack
@@ -12,6 +11,10 @@ import requests
 
 class AWSStack():
 	def __init__(self, path, config, tool):
+		if 'src' in __name__:
+			self.synth_command = 'python -m src.substrate'
+		else:
+			self.synth_command = 'substrate'
 		self.path = path
 		self.config = config
 		self.tool = tool
@@ -28,13 +31,13 @@ class AWSStack():
 
 	def start(self):
 		subprocess.run(
-			f'npx cdk bootstrap --app "{sys.argv[0]} {self.tool.name} -c {self.path} synth"',  # noqa: E501
+			f'npx cdk bootstrap --app "{self.synth_command} {self.tool.name} -c {self.path} synth"',  # noqa: E501
 			check=True,
 			shell=True
 		)
 
 		subprocess.run(
-			f'npx cdk deploy --require-approval never --app "{sys.argv[0]} {self.tool.name} -c {self.path} synth"',  # noqa: E501
+			f'npx cdk deploy --require-approval never --app "{self.synth_command} {self.tool.name} -c {self.path} synth"',  # noqa: E501
 			check=True,
 			shell=True
 		)
@@ -63,7 +66,7 @@ class AWSStack():
 
 	def stop(self):
 		subprocess.run(
-			f'npx cdk destroy --force --app "{sys.argv[0]} {self.tool.name} -c {self.path} synth"',  # noqa: E501
+			f'npx cdk destroy --force --app "{self.synth_command} {self.tool.name} -c {self.path} synth"',  # noqa: E501
 			check=True,
 			shell=True
 		)
