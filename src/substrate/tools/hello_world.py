@@ -8,7 +8,7 @@ class HelloWorld(Tool):
 	def __init__(self, config, data_sources):
 		super().__init__(config, data_sources)
 
-		self.name = 'hello_world'
+		self.name = 'hello-world'
 		self.port = 8000
 
 		self.config = config
@@ -41,5 +41,5 @@ class HelloWorld(Tool):
 			),
 			mounts=mounts,
 			name='hello_world',
-			networks=['substrate-hello_world-net']
+			networks=[f'substrate-{self.name}-net']
 		)

@@ -62,7 +62,7 @@ class Braid(Tool):
 			),
 			mounts=mounts,
 			name='braid',
-			networks=['substrate-braid-net'],
+			networks=[f'substrate-{self.name}-net'],
 			workdir='/opt/run'
 		)
 

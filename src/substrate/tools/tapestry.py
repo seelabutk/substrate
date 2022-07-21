@@ -85,7 +85,7 @@ class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 			),
 			mounts=mounts,
 			name='tapestry',
-			networks=['substrate-tapestry-net']
+			networks=[f'substrate-{self.name}-net']
 		)
 
 	def upload_to_s3(self):

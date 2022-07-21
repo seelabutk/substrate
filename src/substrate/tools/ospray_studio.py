@@ -8,7 +8,7 @@ class OSPRayStudio(Tool):
 	def __init__(self, config, data_sources):
 		super().__init__(config, data_sources)
 
-		self.name = 'ospray_studio'
+		self.name = 'ospray-studio'
 		self.port = 8000
 
 		self.config = config
@@ -41,5 +41,5 @@ class OSPRayStudio(Tool):
 			),
 			mounts=mounts,
 			name='ospray_studio',
-			networks=['substrate-ospray_studio-net']
+			networks=[f'substrate-{self.name}-net']
 		)

@@ -8,7 +8,7 @@ class NetCDFSlicer(Tool):
 	def __init__(self, config, data_sources):
 		super().__init__(config, data_sources)
 
-		self.name = 'nc_slicer'
+		self.name = 'nc-slicer'
 		self.port = 8000
 
 		self.config = config
@@ -37,7 +37,7 @@ class NetCDFSlicer(Tool):
 			),
 			mounts=mounts,
 			name='nc_slicer',
-			networks=['substrate-nc_slicer-net'],
+			networks=[f'substrate-{self.name}-net'],
 			init=True
 		)
 
