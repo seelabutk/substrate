@@ -69,6 +69,14 @@ For more information on configuring each tool, please refer to each tools docume
 - [Tapestry](https://github.com/seelabutk/tapestry)
 - [Braid](https://bitbucket.org/seelabutk/vci)
 
+### Development Environment
+
+To setup the dev environment, please install [Pipenv](https://pipenv-fork.readthedocs.io/en/latest/index.html). Once installed, run the following commands to set up the development environment:
+
+	pipenv --python /path/to/your/python3.10
+	pipenv sync -d
+	pipenv shell
+
 ### Uploading to PyPI
 
 To upload to prepare a new release, run the following commands:
