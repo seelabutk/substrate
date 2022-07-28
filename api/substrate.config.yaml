@@ -36,12 +36,7 @@ aws:
 
 ### Tool settings
 tapestry:
-  dimensions: REQUIRED - a list of the x, y, and z dimensions of the volume to be rendered
-    - 256
-    - 256
-    - 256
   directory: OPTIONAL - directory containing files needed for Tapestry to run
-  filename: REQUIRED - the filename of the data file to be rendered
 
 braid:
   directory: OPTIONAL - directory containing files needed for VCI to run

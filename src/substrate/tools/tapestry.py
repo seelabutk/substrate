@@ -1,6 +1,3 @@
-from copy import deepcopy
-from glob import glob
-import json
 import os
 import subprocess
 
@@ -38,30 +35,6 @@ class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 		self.app_path = os.path.join(self.tapestry_path, 'app')
 		self.config_path = os.path.join(self.tapestry_path, 'config')
 		self.data_sources = data_sources
-
-		self.set_config()
-
-	def set_config(self):
-		config_file = glob(os.path.join(self.config_path, '*.json'))[0]
-		with open(config_file, 'r', encoding='utf8') as _file:
-			tapestry_config = json.load(_file)
-			new_config = deepcopy(tapestry_config)
-
-			filename = self.config['tapestry']['filename']
-
-			# Set dataset-specific Tapestry configuration
-			new_config['filename'] = f'/data/{filename}'
-			new_config['dimensions'] = self.config['tapestry']['dimensions']
-			new_config['cameraPosition'] = [
-				0,
-				0,
-				tapestry_config['dimensions'][-1] * 2
-			]
-
-			# Save the config so it can be changed by the user
-			if new_config != tapestry_config:
-				with open(config_file, 'w', encoding='utf8') as _file:
-					json.dump(new_config, _file)
 
 	def start(self):
 		mounts = super().start()
