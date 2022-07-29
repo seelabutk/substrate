@@ -15,7 +15,7 @@ requests = "*"
 flake8 = "*"
 pyflakes = "*"
 pylint = "*"
-unknown = {editable = true, path = "."}
+substrate = {editable = true, path = "."}
 
 [requires]
 python_version = "3.10"
