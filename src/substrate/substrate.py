@@ -11,9 +11,9 @@ from .targets import AWSStack, DockerSwarm
 from .tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid
 
 TOOLS = {
-	'hello_world': HelloWorld,
-	'nc_slicer': NetCDFSlicer,
-	'ospray_studio': OSPRayStudio,
+	'hello-world': HelloWorld,
+	'nc-slicer': NetCDFSlicer,
+	'ospray-studio': OSPRayStudio,
 	'tapestry': Tapestry,
 	'braid': Braid
 }
