@@ -39,7 +39,7 @@ class AWSStack():
 		)
 
 		location = subprocess.check_output(
-			'aws ec2 describe-instances --filters Name=instance-state-name,Values=running Name=tag:Name,Values=substrate-stack/substrate-leader --query Reservations[*].Instances[*].[PublicIpAddress] --output text',  # noqa: E501
+			f'aws ec2 describe-instances --filters Name=instance-state-name,Values=running Name=tag:Name,Values=substrate-stack-{self.tool.name}/substrate-leader --query Reservations[*].Instances[*].[PublicIpAddress] --output text',  # noqa: E501
 			shell=True
 		).strip().decode('utf-8')
 
