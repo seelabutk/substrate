@@ -8,7 +8,7 @@ class NetCDFSlicer(Tool):
 	def __init__(self, config, data_sources):
 		super().__init__(config, data_sources)
 
-		self.name = 'nc-slicer'
+		self.name = 'nc_slicer'
 		self.port = 8000
 
 		self.config = config

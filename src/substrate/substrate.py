@@ -12,7 +12,7 @@ from .tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid
 
 TOOLS = {
 	'hello-world': HelloWorld,
-	'nc-slicer': NetCDFSlicer,
+	'nc_slicer': NetCDFSlicer,
 	'ospray-studio': OSPRayStudio,
 	'tapestry': Tapestry,
 	'braid': Braid
