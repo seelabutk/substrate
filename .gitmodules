@@ -18,3 +18,6 @@
 	path = src/substrate/tools/tapestry
 	url = git@github.com:seelabutk/tapestry.git
 	branch = substrate
+[submodule "examples/sample_projects/substrate:aws-tapestry"]
+	path = examples/sample_projects/substrate:aws-tapestry
+	url = https://github.com/seelabutk/substrate_tapestry_demo
