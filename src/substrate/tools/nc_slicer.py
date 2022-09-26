@@ -36,7 +36,7 @@ class NetCDFSlicer(Tool):
 				replicas=self.config['docker'].get('replicas', 1)
 			),
 			mounts=mounts,
-			name='nc_slicer',
+			name='nc-slicer',
 			networks=[f'substrate-{self.name}-net'],
 			init=True
 		)

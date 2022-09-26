@@ -40,6 +40,6 @@ class HelloWorld(Tool):
 				replicas=self.config['docker'].get('replicas', 1)
 			),
 			mounts=mounts,
-			name='hello_world',
+			name='hello-world',
 			networks=[f'substrate-{self.name}-net']
 		)

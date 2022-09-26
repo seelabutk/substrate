@@ -40,6 +40,6 @@ class OSPRayStudio(Tool):
 				replicas=self.config['docker'].get('replicas', 1)
 			),
 			mounts=mounts,
-			name='ospray_studio',
+			name='ospray-studio',
 			networks=[f'substrate-{self.name}-net']
 		)
