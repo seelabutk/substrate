@@ -28,7 +28,7 @@ class Braid(Tool):
 			'--mount type=bind,src=/mnt/efs/data,dst=/data '
 			'--mount type=bind,src=/mnt/efs/app,dst=/opt/run '
 			'-w /opt/run'
-			'evilkermit/substrate_vci:latest '
+			'seelab/substrate-braid:latest '
 			'python3.7 -u -m vci'
 		)
 
@@ -48,7 +48,7 @@ class Braid(Tool):
 
 		self.port = self.config['docker'].get('port', self.port)
 		docker.services.create(
-			'evilkermit/substrate_vci:latest',
+			'seelab/substrate-braid:latest',
 			'python3.7',
 			args=['-u', '-m', 'vci'],
 			endpoint_spec=EndpointSpec(ports={self.port: (8840, 'tcp')}),
