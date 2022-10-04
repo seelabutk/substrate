@@ -33,11 +33,12 @@ class Tool():
 	def upload_to_s3(self):
 		print('Syncing data to S3')
 
+		region = self.config['aws'].get('region', 'us-east-1')
 		output = subprocess.check_output('aws s3 ls', shell=True).decode('utf-8')
 
 		if self.config['aws']['bucket'] not in output:
 			subprocess.run(
-				f'aws s3 mb s3://{self.config["aws"]["bucket"]}',
+				f'aws s3 mb s3://{self.config["aws"]["bucket"]} --region { region}',
 				check=True,
 				shell=True
 			)
