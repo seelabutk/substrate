@@ -17,3 +17,5 @@ RUN nvm-0.39.1/install.sh
 SHELL ["/bin/bash", "--login", "-i", "-c"]
 RUN nvm install --lts
 RUN npm install aws-cli
+
+ENV PATH "${PATH}:/root/.nvm/versions/node/v16.17.1/bin"
