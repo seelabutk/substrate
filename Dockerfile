@@ -8,7 +8,7 @@ RUN apt update && apt -y upgrade && apt autoremove && apt install -y \
 
 RUN curl -sSL https://get.docker.com/ | sh
 
-RUN pip install seelabutk-substrate
+RUN pip install seelabutk-substrate==1.4.0
 
 WORKDIR /root
 RUN curl -LO https://github.com/nvm-sh/nvm/archive/refs/tags/v0.39.1.tar.gz
