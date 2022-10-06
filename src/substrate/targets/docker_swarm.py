@@ -125,10 +125,8 @@ class DockerSwarm():
 					self.log('✓\n')
 
 		self.log('Removing the swarm service…')
-		map(
-			lambda service: service.remove(),
-			self.docker.service.list(name=self.tool.name)
-		)
+		for obj in self.docker.services.list(filters={'name': self.tool.name}) + self.docker.networks.list(names=[f'substrate-{self.tool.name}-net']):  # noqa: E501
+			obj.remove()
 		self.log('✓\n')
 
 	def log(self, message):
