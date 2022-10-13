@@ -15,6 +15,8 @@ class AWSStack():
 		self.config = config
 		self.tool = tool
 
+		os.environ['AWS_DEFAULT_REGION'] = self.config['aws'].get('region', 'us-east-1')  # noqa: E501
+
 		app = App()
 		_AWSStack(
 			app,
@@ -39,7 +41,7 @@ class AWSStack():
 		)
 
 		location = subprocess.check_output(
-			f'aws ec2 describe-instances --filters Name=instance-state-name,Values=running Name=tag:Name,Values=substrate-stack-{self.tool.name}/substrate-leader --query Reservations[*].Instances[*].[PublicIpAddress] --output text',  # noqa: E501
+			f'aws ec2 describe-instances --region {self.config["aws"].get("region", "us-east-1")} --filters Name=instance-state-name,Values=running Name=tag:Name,Values=substrate-stack-{self.tool.name}/substrate-leader --query Reservations[*].Instances[*].[PublicIpAddress] --output text',  # noqa: E501
 			shell=True
 		).strip().decode('utf-8')
 
