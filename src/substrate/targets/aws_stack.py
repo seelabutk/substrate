@@ -2,7 +2,7 @@ import os
 import subprocess
 from time import sleep
 
-from aws_cdk import App, RemovalPolicy, Stack
+from aws_cdk import App, Environment, RemovalPolicy, Stack
 from aws_cdk import aws_ec2 as ec2
 from aws_cdk import aws_efs as efs
 from aws_cdk import aws_iam as iam
@@ -14,8 +14,7 @@ class AWSStack():
 		self.path = path
 		self.config = config
 		self.tool = tool
-
-		os.environ['AWS_DEFAULT_REGION'] = self.config['aws'].get('region', 'us-east-1')  # noqa: E501
+		self.region = self.config['aws'].get('region', 'us-east-1')  # noqa: E501
 
 		app = App()
 		_AWSStack(
@@ -23,7 +22,8 @@ class AWSStack():
 			f'substrate-stack-{self.tool.name}',
 			tool,
 			config,
-			self.tool.data_sources[1]
+			self.tool.data_sources[1],
+			env=Environment(region=self.region)
 		)
 		app.synth()
 
@@ -41,7 +41,7 @@ class AWSStack():
 		)
 
 		location = subprocess.check_output(
-			f'aws ec2 describe-instances --region {self.config["aws"].get("region", "us-east-1")} --filters Name=instance-state-name,Values=running Name=tag:Name,Values=substrate-stack-{self.tool.name}/substrate-leader --query Reservations[*].Instances[*].[PublicIpAddress] --output text',  # noqa: E501
+			f'aws ec2 describe-instances --region {self.region} --filters Name=instance-state-name,Values=running Name=tag:Name,Values=substrate-stack-{self.tool.name}/substrate-leader --query Reservations[*].Instances[*].[PublicIpAddress] --output text',  # noqa: E501
 			shell=True
 		).strip().decode('utf-8')
 
@@ -99,7 +99,7 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 		ami_string = self.config['aws'].get('ami', None)
 		if ami_string:
 			self.ami = ec2.MachineImage.generic_linux({
-				self.config['aws'].get('region', 'us-east-1'): 'ami-048ff3da02834afdc'
+				self.region: 'ami-048ff3da02834afdc'
 			})
 		else:
 			self.ami = ec2.MachineImage.latest_amazon_linux(
@@ -126,7 +126,7 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 		udata = ec2.UserData.for_linux()
 		self.add_leader_commands(
 			udata,
-			f'export AWS_DEFAULT_REGION={self.config["aws"].get("region", "us-east-1")}',  # noqa: E501
+			f'export AWS_DEFAULT_REGION={self.region}',  # noqa: E501
 			f'export AWS_ACCESS_KEY_ID={os.environ.get("AWS_ACCESS_KEY_ID")}',
 			f'export AWS_SECRET_ACCESS_KEY={os.environ.get("AWS_SECRET_ACCESS_KEY")}',
 			f'export AWS_SESSION_TOKEN={os.environ.get("AWS_SESSION_TOKEN", "")}',
@@ -139,7 +139,7 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 			'sudo yum install -y nfs-utils',
 			'sudo yum install -y python3',
 			'sudo mkdir -p "/mnt/efs"',
-			f'test -f "/sbin/mount.efs" && echo "{self.file_system.file_system_id}:/ /mnt/efs efs defaults,_netdev" >> /etc/fstab || echo "{self.file_system.file_system_id}.efs.{self.config["aws"].get("region", "us-east-1")}.amazonaws.com:/ /mnt/efs nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab',  # noqa: E501
+			f'test -f "/sbin/mount.efs" && echo "{self.file_system.file_system_id}:/ /mnt/efs efs defaults,_netdev" >> /etc/fstab || echo "{self.file_system.file_system_id}.efs.{self.region}.amazonaws.com:/ /mnt/efs nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab',  # noqa: E501
 			'mount -a -t efs,nfs4 defaults',
 			'until mountpoint -d /mnt/efs; do mount -a -t efs,nfs4 defaults; done'
 		)
