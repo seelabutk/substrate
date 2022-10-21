@@ -25,6 +25,7 @@ docker:
 ### AWS deployment
 aws:
   ami: REQUIRED if you don't have access to SSM - the ID of the Amazon Machine Image to use
+  https: OPTIONAL (default: false) - should the container deploy an Application Load Balancer in front of the EC2 instance? You will need to add your own SSL cert to the balancer before HTTPS will work.
   region: REQUIRED - the region to deploy to
   replicas: OPTIONAL - the number of replicas the Docker swarm should use
   role_arn: REQUIRED if you don't have access to create IAM roles - the role ARN of the IAM role you want to use to deploy

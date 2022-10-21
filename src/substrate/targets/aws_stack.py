@@ -5,7 +5,9 @@ from time import sleep
 from aws_cdk import App, Environment, RemovalPolicy, Stack
 from aws_cdk import aws_ec2 as ec2
 from aws_cdk import aws_efs as efs
+from aws_cdk import aws_elasticloadbalancingv2 as elb
 from aws_cdk import aws_iam as iam
+from aws_cdk.aws_elasticloadbalancingv2_targets import InstanceTarget
 import requests
 
 
@@ -15,6 +17,7 @@ class AWSStack():
 		self.config = config
 		self.tool = tool
 		self.region = self.config['aws'].get('region', 'us-east-1')  # noqa: E501
+		self.use_https = self.config['aws'].get('https', False)
 
 		app = App()
 		_AWSStack(
@@ -40,6 +43,7 @@ class AWSStack():
 			shell=True
 		)
 
+		# TODO: this needs to be different for HTTPS
 		location = subprocess.check_output(
 			f'aws ec2 describe-instances --region {self.region} --filters Name=instance-state-name,Values=running Name=tag:Name,Values=substrate-stack-{self.tool.name}/substrate-leader --query Reservations[*].Instances[*].[PublicIpAddress] --output text',  # noqa: E501
 			shell=True
@@ -81,6 +85,8 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 		self.config = config
 		self.data_urls = data_urls
 		self.leader_name = ''
+		self.nodes = []
+		self.use_https = self.config['aws'].get('https', False)
 
 		self.tool.upload_to_s3()
 
@@ -89,7 +95,7 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 		self.vpc = ec2.Vpc(
 			self,
 			_id,
-			max_azs=1,
+			max_azs=2 if self.use_https else 1,
 			nat_gateways=0,
 			subnet_configuration=[
 				ec2.SubnetConfiguration(name='public', subnet_type=ec2.SubnetType.PUBLIC)
@@ -114,6 +120,8 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 
 		self.file_system = self.provision_fs()
 		self.provision_ec2()
+		if self.use_https:
+			self.provision_elb()
 
 	def add_leader_commands(self, udata, *args):
 		for command in args:
@@ -181,7 +189,6 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 		managers = self.config['aws'].get('managers', {})
 		workers = self.config['aws'].get('workers', {})
 
-		nodes = []
 		for index, _type in enumerate(managers):
 			count = managers.get(_type, 1)
 			for index2 in range(count):
@@ -192,7 +199,7 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 					instance_name = f'substrate-manager-{_type}-{index}'
 					udata = self.get_udata('manager')
 
-				nodes.append(ec2.Instance(
+				self.nodes.append(ec2.Instance(
 					self,
 					instance_name,
 					instance_type=ec2.InstanceType(instance_type_identifier=_type),
@@ -208,7 +215,7 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 
 			count = workers.get(_type, 1)
 			for index in range(count):
-				nodes.append(ec2.Instance(
+				self.nodes.append(ec2.Instance(
 					self,
 					f'substrate-worker-{_type}-{index}',
 					instance_type=ec2.InstanceType(instance_type_identifier=_type),
@@ -219,7 +226,7 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 					vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC)
 				))
 
-		for node in nodes:
+		for node in self.nodes:
 			node.node.add_dependency(self.file_system.mount_targets_available)
 
 			if self.role:
@@ -231,6 +238,19 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 				ec2.Port.all_traffic(),
 				'General Purpose'
 			)
+
+	def provision_elb(self):
+		load_balancer = elb.ApplicationLoadBalancer(
+			self,
+			'substrate-elb',
+			vpc=self.vpc
+		)
+		listener = load_balancer.add_listener('substrate-elb-listener', port=80)
+		listener.add_targets(
+			'substrate-ec2-targets',
+			port=80,
+			targets=[InstanceTarget(instance) for instance in self.nodes]
+		)
 
 	def provision_fs(self):
 		efs_sg = ec2.SecurityGroup(self, 'substrate-efs-sg', vpc=self.vpc)

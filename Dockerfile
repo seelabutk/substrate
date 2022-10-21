@@ -21,6 +21,6 @@ RUN unzip awscliv2.zip
 RUN aws/install
 RUN npm install aws-cdk aws-cdk-lib
 
-RUN pip install seelabutk-substrate==1.4.5
+RUN pip install seelabutk-substrate==1.5.2
 
 ENV PATH "${PATH}:/root/.nvm/versions/node/v16.17.1/bin"
