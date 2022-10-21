@@ -20,7 +20,7 @@ class NetCDFSlicer(Tool):
 			'--publish 80:5000/tcp '
 			f'--replicas {self.config.get("aws", {}).get("replicas", 1)} '
 			'--mount type=bind,src=/mnt/efs/data,dst=/data '
-			'jhammer3/substrate:nc_slicer'
+			'seelab/substrate-nc-slicer'
 			'python app.py'
 		)
 
@@ -29,7 +29,7 @@ class NetCDFSlicer(Tool):
 		docker = from_env()
 
 		docker.services.create(
-			'jhammer3/substrate:nc_slicer',
+			'seelab/substrate-nc-slicer',
 			endpoint_spec=EndpointSpec(ports={self.port: (5000, 'tcp')}),
 			mode=ServiceMode(
 				mode='replicated',

@@ -5,6 +5,7 @@ import sys
 import time
 
 from docker import from_env
+from docker.errors import APIError
 import paramiko
 
 
@@ -25,10 +26,13 @@ class DockerSwarm():
 	def create_swarm(self):
 		self.log('Initializing the swarm…')
 		advertise_addr = self.config['docker'].get('advertise_addr', None)
-		if advertise_addr:
-			self.docker.swarm.init(advertise_addr=advertise_addr)
-		else:
-			self.docker.swarm.init()
+		try:
+			if advertise_addr:
+				self.docker.swarm.init(advertise_addr=advertise_addr)
+			else:
+				self.docker.swarm.init()
+		except APIError:
+			pass
 		self.log('✓\n')
 
 		self.network = self.docker.networks.create(
@@ -120,8 +124,9 @@ class DockerSwarm():
 				else:
 					self.log('✓\n')
 
-		self.log('Destroying the swarm…')
-		self.docker.swarm.leave(force=True)
+		self.log('Removing the swarm service…')
+		for obj in self.docker.services.list(filters={'name': self.tool.name}) + self.docker.networks.list(names=[f'substrate-{self.tool.name}-net']):  # noqa: E501
+			obj.remove()
 		self.log('✓\n')
 
 	def log(self, message):

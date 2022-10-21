@@ -7,7 +7,7 @@ name = "pypi"
 aws-cdk-lib = "~=2.24.1"
 constructs = "~=10.1.11"
 docker = "*"
-paramiko = ">=2.10.1"
+paramiko = ">=2.11.0"
 PyYAML = "*"
 requests = "*"
 

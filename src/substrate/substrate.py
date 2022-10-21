@@ -59,7 +59,7 @@ class Substrate():
 			else:
 				data_paths.append(os.path.abspath(source_path))
 
-			if os.path.isfile(data_paths[-1]):
+			if data_paths and os.path.isfile(data_paths[-1]):
 				data_paths[-1] = os.path.dirname(data_paths[-1])
 
 		return (data_paths, data_urls)

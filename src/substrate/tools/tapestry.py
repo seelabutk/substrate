@@ -25,7 +25,7 @@ class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 			'--mount type=bind,src=/mnt/efs/app,dst=/app '
 			'--mount type=bind,src=/mnt/efs/config,dst=/config '
 			'--mount type=bind,src=/mnt/efs/data,dst=/data '
-			'evilkermit/substrate_tapestry:latest '
+			'seelab/substrate-tapestry:latest '
 			'./server /config 9010 /app'
 		)
 
@@ -47,7 +47,7 @@ class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 
 		self.port = self.config['docker'].get('port', self.port)
 		docker.services.create(
-			'evilkermit/substrate_tapestry:latest',
+			'seelab/substrate-tapestry:latest',
 			'./server',
 			args=['/config', '9010', '/app'],
 			endpoint_spec=EndpointSpec(ports={self.port: (9010, 'tcp')}),
