@@ -163,6 +163,7 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 			self.add_leader_commands(
 				udata,
 				f'aws s3 sync s3://{self.config["aws"]["bucket"]} /mnt/efs',
+				'mkdir -p /mnt/efs/data',
 				'cd /mnt/efs/data',
 				*[f'curl -O {data_url}' for data_url in self.data_urls],
 				'cd -'
