@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from argparse import ArgumentParser
 import os
+import subprocess
 import sys
-from urllib.request import urlretrieve
 from urllib.parse import urlparse
 
 import yaml
@@ -23,6 +23,7 @@ class Substrate():
 	def __init__(self, tool_name, path=None):
 		self.tool_name = tool_name
 		self.path, self.config = self._parse_yaml(path)
+		self._check_config()
 
 		self.target = None
 		if self.config.get('aws', None) is not None:
@@ -37,24 +38,59 @@ class Substrate():
 
 		self.target_obj = self.target(self.path, self.config, self.tool)
 
+	def _check_config(self):
+		config = self.config
+
+		if 'aws' not in config and 'docker' not in config:
+			raise Exception(
+				'No deployment target was chosen. Please choose either "aws" or "docker".'
+			)
+
+		if 'aws' in config and 'docker' in config:
+			raise Exception(
+				'The "aws" and "docker" options cannot be used simultaneously.'
+			)
+
+		if 'aws' in config:
+			if not os.environ.get('AWS_ACCESS_KEY_ID', False):
+				raise Exception(
+					'AWS_ACCESS_KEY_ID environment variable must be set to deploy to AWS.'
+				)
+
+			if not os.environ.get('AWS_SECRET_ACCESS_KEY', False):
+				raise Exception(
+					'AWS_SECRET_ACCESS_KEY environment variable must be set to deploy to AWS.'
+				)
+
+		if 'docker' in config:
+			try:
+				subprocess.check_call(
+					'docker info',
+					shell=True,
+					stdout=subprocess.DEVNULL,
+					stderr=subprocess.DEVNULL
+				)
+			except subprocess.CalledProcessError as exc:
+				raise Exception(
+					"Docker doesn't appear to be running. Please check that it's installed "
+					"and the daemon is running."
+				) from exc
+
 	def _get_data(self, config):
 		source_paths = config['data']['source']
 		data_paths = []
 		data_urls = []
 
 		for source_path in source_paths:
-			is_url = urlparse(source_path).scheme.startswith(('ftp', 'http'))
+			is_url = urlparse(source_path).scheme.startswith(('ftp', 'http', 's3'))
 
-			# Download the dataset if necessary to the target location
 			if is_url and self.target == DockerSwarm:
-				target_path = os.path.abspath(config['data']['target'])
+				raise Exception(
+					'You cannot use remote data sources with a local deployment. Please '
+					'download the dataset and reference it locally in data.source.'
+				)
 
-				os.makedirs(os.path.dirname(target_path), exist_ok=True)
-				urlretrieve(source_path, target_path)
-
-				if target_path not in data_paths:
-					data_paths.append(target_path)
-			elif is_url:
+			if is_url:
 				data_urls.append(source_path)
 			else:
 				data_paths.append(os.path.abspath(source_path))
@@ -78,9 +114,6 @@ class Substrate():
 
 		with open(path, 'r', encoding='utf8') as stream:
 			_config = yaml.load(stream, Loader=yaml.Loader)
-
-		if _config.get('docker', None) and _config.get('aws', None):
-			sys.exit('The "docker" and "aws" options cannot be used simultaneously.')
 
 		return (path, _config)
 

@@ -54,7 +54,7 @@ class AWSStack():
 		while True:
 			print('Checking if AWS instance is ready…', end='')
 			try:
-				response = requests.get(f'http://{location}')
+				response = requests.get(f'http://{location}', timeout=10)
 				if response.status_code == 200:
 					break
 			except requests.exceptions.ConnectionError:
@@ -83,10 +83,20 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 	def __init__(self, scope, _id, tool, config, data_urls, **kwargs):
 		self.tool = tool
 		self.config = config
-		self.data_urls = data_urls
+
 		self.leader_name = ''
 		self.nodes = []
 		self.use_https = self.config['aws'].get('https', False)
+
+		self.data_urls = [
+			data_url for data_url in data_urls if not data_url.startswith('s3')
+		]
+		self.data_buckets = [
+			data_url.split('|') for data_url in data_urls if data_url.startswith('s3')
+		]
+		for bucket in self.data_buckets:
+			if len(bucket) < 2:
+				bucket.append('*')
 
 		self.tool.upload_to_s3()
 
@@ -165,6 +175,7 @@ class _AWSStack(Stack):  # pylint: disable=too-many-instance-attributes
 				f'aws s3 sync s3://{self.config["aws"]["bucket"]} /mnt/efs',
 				'mkdir -p /mnt/efs/data',
 				'cd /mnt/efs/data',
+				*[f'aws s3 sync {data_bucket[0]} /mnt/efs/data --exclude "*" --include "{data_bucket[1]}"' for data_bucket in self.data_buckets],  # noqa: E501
 				*[f'curl -O {data_url}' for data_url in self.data_urls],
 				'cd -'
 			)
