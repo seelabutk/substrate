@@ -21,3 +21,6 @@
 [submodule "examples/sample_projects/substrate:aws-tapestry"]
 	path = examples/sample_projects/substrate:aws-tapestry
 	url = https://github.com/seelabutk/substrate_tapestry_demo
+[submodule "examples/sample_projects/substrate:braid"]
+	path = examples/sample_projects/substrate:braid
+	url = https://github.com/seelabutk/substrate-braid-demo
