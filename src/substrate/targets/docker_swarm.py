@@ -17,7 +17,8 @@ class DockerSwarm():
 		self.docker = from_env()
 		self.network = None
 
-		ssh_dir = os.path.join(Path.home(), '.ssh')
+		# ssh_dir = os.path.join(Path.home(), '.ssh')
+		ssh_dir = os.path.join('/home/hp', '.ssh')
 		ssh_dirfiles = os.listdir(ssh_dir)
 		ssh_keys = [keyfile for keyfile in ssh_dirfiles if keyfile.startswith('id_')]
 		ssh_pkeys = [keyfile for keyfile in ssh_keys if not keyfile.endswith('.pub')]

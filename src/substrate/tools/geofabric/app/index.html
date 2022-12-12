@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+    <head>
+        <title>GeoFabric</title>
+        <link rel="stylesheet" href="css/style.css">
+
+        <!-- jQuery dependency -->
+        <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+        <!-- For testing -->
+        <script src="js/smooth.js"></script>
+        <script src="js/gremlins.min.js"></script>
+        <script src="js/testing.js"></script>
+
+        <!-- Core Tapestry JS -->
+        <script src="js/tools.js"></script>
+        <script src="js/sylvester.js"></script>
+        <script src="js/math.js"></script>
+        <script src="js/arcball.js"></script>
+        <script src="js/tapestry.js"></script>
+        <script src="js/main.js"></script>
+
+        <!-- For minified version -->
+        <!-- <script src="js/tapestry.min.js></script> -->
+    </head>
+    <body>
+        <div class="keyframes"></div>
+        <div 
+            class="hyperimage" 
+            id="LFBB_input" 
+            data-dataset="LFBB_input" /> 
+        </div>   
+        <!-- data-timerange="0..500" -->
+        <!-- data-variable="Accumulated_Precipitation"  -->
+
+        <a class="hyperaction" href="#" for="LFBB_input" data-action="position=0,255,255">Set camera</a>
+        <a class="hyperaction" href="#" for="LFBB_input" data-action="play()">Start</a>
+        <a class="hyperaction" href="#" for="LFBB_input" data-action="stop()">Stop</a>
+
+        <br>
+        Variable Select:
+        <select class="variable-select" id="LFBB_input"></select>
+
+        <!-- Timestep Slider -->
+        <br>
+        Timestep:
+         <input class="timestep-slider" id="LFBB_input" type="range">
+    </body>
+</html>

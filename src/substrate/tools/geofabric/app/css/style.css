@@ -1,0 +1,18 @@
+html, body
+{
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+.hyperimage
+{
+    display: block;
+    margin: 5px auto;
+    border: 1px solid #000000;
+}
+.keyframes img 
+{
+    display: inline-block;
+    width: 150px;
+    height: 150px;
+}
