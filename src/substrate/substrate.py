@@ -7,8 +7,8 @@ from urllib.parse import urlparse
 
 import yaml
 
-from .targets import AWSStack, DockerSwarm
-from .tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid, GeoFabric
+from targets import AWSStack, DockerSwarm
+from tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid, GeoFabric, GeofabricNetCDFSlicer
 
 TOOLS = {
 	'hello-world': HelloWorld,
@@ -16,7 +16,8 @@ TOOLS = {
 	'ospray-studio': OSPRayStudio,
 	'tapestry': Tapestry,
 	'geofabric': GeoFabric,
-	'braid': Braid
+	'braid': Braid,
+	'geofabric_nc_slicer': GeofabricNetCDFSlicer
 }
 
 

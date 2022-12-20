@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></link>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCHM</title>
+
+
+	<!DOCTYPE html>
+	<html lang="en">
+	
+	<head>
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+		</link>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>DCHM</title>
+		<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+		<script src="{{ url_for('static', filename='js/render.js') }}"></script>
+		<!-- src/substrate/tools/nc_slicer/app/static/js/jquery-1.12.4.min.js -->
+		<!-- Core Tapestry JS -->
+		<script src="{{ url_for('static', filename='js/jquery-1.12.4.min.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/tools.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/sylvester.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/math.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/arcball.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/tools.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/tapestry.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+	</head>
+	
+	<body>
+		<div class="header">
+			<h1>Render DCHM</h1>
+		</div>
+		<div class="row">
+			<!-- Input Var Form -->
+			<div class="column">
+				<h2>Input Variables</h2>
+				<div class="form">
+					<label for="region-input">Basin: </label>
+					<select name="basin-input" id="basin-input" class="basin-input"> 
+						<!-- <option value="PRB">PRB</option>
+						<option value="LTTB">LTTB</option> -->
+						<option value="LFBB" selected>LFBB</option>
+						<!-- <option value="LPRB">LPRB</option> -->
+					</select>
+					<br> 
+					<label for="varname-input">Variable:</label>
+					<select name="vname-input" id="varname-input" class="varname-input"></select>
+					<br> 
+					<label for="date-input">Date:</label>
+					<input type="date" id="date-input" name="date-input" class="date-input" min="2016-08-01" max="2019-12-31" value="2016-08-01">
+					<br> 
+					<label for="hour-input">Hour:</label>
+					<input type="number" id="hour-input" name="hour-input" class="hour-input" min="1" max="24" value="1">
+				</div>
+			</div>
+			<!-- Output Var Form -->
+			<div class="column">
+				<h2>Output Variables</h2>
+				<div class="form">
+					<label for="region-output">Basin: </label>
+					<select name="basin-output" id="basin-output" class="basin-output">
+						<!-- <option value="PRB">PRB</option>
+						<option value="LTTB">LTTB</option> -->
+						<option value="LFBB" selected>LFBB</option>
+						<option value="LPRB">LPRB</option>
+					</select>
+					<br> 
+					<label for="varname-output">Variable:</label>
+					<select name="vname-output" id="varname-output" class="varname-output"></select>
+					<br> 
+					<label for="date-output">Date:</label>
+					<input type="date" id="date-output" class="date-output" name="date-output" min="2016-08-01" max="2019-12-31" value="2016-08-01">
+					<br> 
+					<label for="hour-output">Hour:</label>
+					<input type="number" id="hour-output" class="date-output" name="hour-output" min="1" max="24" value="1">
+				</div>
+			</div>
+	
+		</div>
+		<div class="done"></div>
+		<div class="row">
+			<!-- <div class="column"><img class="render-input" id="renderedimg-input"></img></div>
+			<div class="column"><img class="render-output" id="renderedimg-output"></img></div> -->
+			<div class="column">
+				<div class="hyperimage" id="LFBB_input" data-dataset="LFBB_input" data-variable="Accumulated_Precipitation" /> </div>   
+			</div>
+			<div class="column">
+				<div class="hyperimage" id="output_var" data-dataset="LFBB_input" data-variable="Accumulated_Precipitation"/></div>  
+			</div>
+		</div>
+		<!-- <button class="button render-btn" onclick="render()">Render</button> -->
+		<iframe style="display:none" name="hidden-form"></iframe>
+	</body>
+
+	
+	</html>
+</head>
