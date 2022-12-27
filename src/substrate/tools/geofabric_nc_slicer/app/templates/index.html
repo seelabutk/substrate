@@ -40,10 +40,10 @@
 				<div class="form">
 					<label for="region-input">Basin: </label>
 					<select name="basin-input" id="basin-input" class="basin-input"> 
-						<!-- <option value="PRB">PRB</option>
-						<option value="LTTB">LTTB</option> -->
+						<option value="PRB">PRB</option>
+						<option value="LTTB">LTTB</option>
 						<option value="LFBB" selected>LFBB</option>
-						<!-- <option value="LPRB">LPRB</option> -->
+						<option value="LPRB">LPRB</option>
 					</select>
 					<br> 
 					<label for="varname-input">Variable:</label>
@@ -62,8 +62,8 @@
 				<div class="form">
 					<label for="region-output">Basin: </label>
 					<select name="basin-output" id="basin-output" class="basin-output">
-						<!-- <option value="PRB">PRB</option>
-						<option value="LTTB">LTTB</option> -->
+						<option value="PRB">PRB</option>
+						<option value="LTTB">LTTB</option>
 						<option value="LFBB" selected>LFBB</option>
 						<option value="LPRB">LPRB</option>
 					</select>
@@ -82,16 +82,13 @@
 		</div>
 		<div class="done"></div>
 		<div class="row">
-			<!-- <div class="column"><img class="render-input" id="renderedimg-input"></img></div>
-			<div class="column"><img class="render-output" id="renderedimg-output"></img></div> -->
 			<div class="column">
 				<div class="hyperimage" id="LFBB_input" data-dataset="LFBB_input" data-variable="Accumulated_Precipitation" /> </div>   
 			</div>
 			<div class="column">
-				<div class="hyperimage" id="output_var" data-dataset="LFBB_input" data-variable="Accumulated_Precipitation"/></div>  
+				<div class="hyperimage" id="output_var" data-dataset="LFBB_output"  /></div>  
 			</div>
 		</div>
-		<!-- <button class="button render-btn" onclick="render()">Render</button> -->
 		<iframe style="display:none" name="hidden-form"></iframe>
 	</body>
 

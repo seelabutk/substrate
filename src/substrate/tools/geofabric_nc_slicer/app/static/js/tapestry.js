@@ -1,10 +1,3 @@
-// function varList(data) {
-//     console.log("here");
-//     console.log(data);
-//     result = data;
-//     return data
-// }
-
 /**
  * The main tapestry module written in the jQuery module format
  * @namespace Tapestry
@@ -446,30 +439,30 @@
         var n_cols = Math.sqrt(n_tiles);
         var width = this.settings.width;
 
-	var tiles = new Array(n_tiles).fill(0).map(function(d, i) { return i; });
-	if (false && imagesize !== 0) {
-	    tiles = tiles.filter(function(d, i) {
-	        const x = i % n_cols - (n_cols/2|0) + 0.5,
-	              y = (i / n_cols|0) - (n_cols/2|0) + 0.5,
-		      dist = Math.hypot(x, y) / Math.hypot(n_cols/2-0.5, n_cols/2-0.5);
-	        return dist < 0.5;
-	    });
-	}
-	if (false) {
-	    tiles = tiles.filter(function(d, i) {
-	        const x = i % n_cols - (n_cols/2|0) + 0.5,
-	              y = (i / n_cols|0) - (n_cols/2|0) + 0.5,
-		      dist = Math.hypot(x, y) / Math.hypot(n_cols/2-0.5, n_cols/2-0.5);
-	        return Math.abs(y) < 0.15 * n_cols;
-	    });
-	}
-	var seed = new Array(n_tiles).fill(0).map(function(d, i, arr) {
-	    const x = i % n_cols - (n_cols/2|0) + 0.5,
-	          y = (i / n_cols|0) - (n_cols/2|0) + 0.5,
-		  dist = Math.hypot(x, y) / Math.hypot(n_cols/2-0.5, n_cols/2-0.5);
-	    return dist;
+        var tiles = new Array(n_tiles).fill(0).map(function(d, i) { return i; });
+        if (false && imagesize !== 0) {
+            tiles = tiles.filter(function(d, i) {
+                const x = i % n_cols - (n_cols/2|0) + 0.5,
+                    y = (i / n_cols|0) - (n_cols/2|0) + 0.5,
+                    dist = Math.hypot(x, y) / Math.hypot(n_cols/2-0.5, n_cols/2-0.5);
+                return dist < 0.5;
+            });
+        }
+        if (false) {
+            tiles = tiles.filter(function(d, i) {
+                const x = i % n_cols - (n_cols/2|0) + 0.5,
+                    y = (i / n_cols|0) - (n_cols/2|0) + 0.5,
+                    dist = Math.hypot(x, y) / Math.hypot(n_cols/2-0.5, n_cols/2-0.5);
+                return Math.abs(y) < 0.15 * n_cols;
+            });
+        }
+        var seed = new Array(n_tiles).fill(0).map(function(d, i, arr) {
+            const x = i % n_cols - (n_cols/2|0) + 0.5,
+                y = (i / n_cols|0) - (n_cols/2|0) + 0.5,
+            dist = Math.hypot(x, y) / Math.hypot(n_cols/2-0.5, n_cols/2-0.5);
+            return dist;
         });
-	tiles.sort(function(a, b) { return seed[a] - seed[b]; });
+        tiles.sort(function(a, b) { return seed[a] - seed[b]; });
 
         var requests = [];
         for (let i of tiles)
@@ -482,15 +475,15 @@
             // store timings in the log
             this.timelog[path.slice(path.indexOf("/image/"))] = [Date.now(), imagesize, false, 0];
 
-	    const timeoutId = setTimeout(function() {
-	        console.log('timeout');
-	        //window._requests.delete(img);
-	    }, 1000);
+            const timeoutId = setTimeout(function() {
+                console.log('timeout');
+                //window._requests.delete(img);
+            }, 1000);
 	    
-	    img.onload = function(ev) {
-	        clearTimeout(timeoutId);
+            img.onload = function(ev) {
+                clearTimeout(timeoutId);
                 var image_path = ev.target.src.slice(
-                        ev.target.src.indexOf("/image/"));
+                    ev.target.src.indexOf("/image/"));
 
                 var tile = $(self.element)
                     .find("#tapestry-tile-" + i).eq(0);
@@ -504,10 +497,10 @@
             }
             img.src = path;
 
-                var tile = $(this.element)
-                    .find("#tapestry-tile-" + i).eq(0);
+            var tile = $(this.element)
+                .find("#tapestry-tile-" + i).eq(0);
             tile.attr("src", path);
-               
+
             window._requests.add(img);
         }
 
@@ -521,61 +514,7 @@
                 this.linked_objs[i].render(imagesize, true);
             }
         }
-        // if (typeof remote_call === 'undefined')
-        // {
-        //     remote_call = false;
-        // }
 
-        // var n_tiles = this.settings.n_tiles;
-        // var n_cols = Math.sqrt(n_tiles);
-        // var width = this.settings.width;
-
-        // var requests = [];
-        // for (var i = 0; i < n_tiles; i++)
-        // {
-        //     var path = this.make_request(imagesize, i);
-        //     console.log(path)
-        //     var img = new Image();
-        //     var self = this;
-        //     img.tileid = i.toString();
-
-        //     // store timings in the log
-        //     // this.timelog[path] = [Date.now(), imagesize, false, 0];
-        //     // store timings in the log
-        //     this.timelog[path.slice(path.indexOf("/image/"))] = [Date.now(), imagesize, false, 0];
-
-        //     img.onload = function(ev) {
-
-        //         var image_path = ev.target.src.slice(
-        //                 ev.target.src.indexOf("/image/"));
-        //         console.log("loaded")
-        //         console.log(image_path)
-        //         console.log(self.timelog)
-        //         console.log(self.timelog[image_path])
-        //         self.timelog[image_path][3] = Date.now();
-        //         self.timelog[image_path][2] = true;
-
-        //         var tile = $(self.element)
-        //             .find("#tapestry-tile-" + this.tileid).eq(0);
-        //         tile.attr("src", this.src);
-        //     }
-        //     img.src = path;
-        // }
-
-        // // Don't rotate linked views if this call is
-        // // from one of them otherwise it'll be an infinite
-        // // loop
-        // if (!remote_call)
-        // {
-        //     for (var i = 0; i < this.linked_objs.length; i++)
-        //     {
-        //         this.linked_objs[i].render(imagesize, true);
-        //     }
-        // }
-
-        // this.settings.callbacks.forEach(element => {
-        //     element(this);
-        // });
     }
 
     /**

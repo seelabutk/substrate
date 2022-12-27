@@ -26,9 +26,9 @@ $(document).ready(function(){
      * Setup tapestry
      */
     $(".hyperimage").tapestry({
-        host: "http://127.0.0.1:8000",
-        // host: "http://accona.eecs.utk.edu:8000",
-        n_tiles: 4,
+        // host: "http://127.0.0.1:8000",
+        host: "http://kavir.eecs.utk.edu:8000",
+        n_tiles: 16,
         width: 1024,
         height: 1024,
         animation_interval: 500,
@@ -53,7 +53,6 @@ $(document).ready(function(){
         });
     }
     function set_basin(i){
-        console.log($(".hyperimage").eq(0).data("tapestry"));//.eq(i).data("tapestry");)
         var hyperimg = get_hyperimg(i);
         console.log(hyperimg)
         if (i==0){
@@ -67,19 +66,22 @@ $(document).ready(function(){
         var basin = ele.value+"_"+suffix;
         console.log(basin)
         console.log(hyperimg.settings.variable_list)
+        
         // switch the config to the selected basin ( also sets up the variable list )
         hyperimg.do_action("switch_config(" + basin + ")")
 
         // reset input_var variables
-        fillOptions(document.getElementById("varname-"+suffix), hyperimg.settings.variable_list)
+        fillOptions(document.getElementById("varname-"+suffix), hyperimg.settings.variable_list);
+        console.log('rendering after variable set')
+        hyperimg.render(0);
     }
 
     $(".basin-input").on("input", function(){
         set_basin(0);
     });
-    // $(".basin-output").on("input", function(){
-    //     set_basin(1);
-    // });
+    $(".basin-output").on("input", function(){
+        set_basin(1);
+    });
 
     /**
      * Setup call back for variable selection
@@ -87,13 +89,12 @@ $(document).ready(function(){
     
     function set_variable(val, i){
         var hyperimg = get_hyperimg(i);
-        // console.log($(this))
-        // console.log(val)
         hyperimg.settings.variable=val;
+        console.log('rendering after variable set')
         hyperimg.render(0);
     }
     $(".varname-input").on("input",  function(){ set_variable($(this).val(), 0) });
-    // $(".varname-output").on("input", function(){ set_variable($(this).val(), 1) });
+    $(".varname-output").on("input", function(){ set_variable($(this).val(), 1) });
 
     /**
      * Setup call back for date selection
@@ -134,10 +135,10 @@ $(document).ready(function(){
         }
     }
     $(".date-input").on("input",  function(){ set_timestep(0); });
-    // $(".date-output").on("input", function(){ set_timestep(1); });
+    $(".date-output").on("input", function(){ set_timestep(1); });
     $(".hour-input").on("input",  function(){ set_timestep(0); });
-    // $(".hour-output").on("input", function(){ set_timestep(1); });
+    $(".hour-output").on("input", function(){ set_timestep(1); });
 
     set_basin(0);
-    // set_basin(1);
+    set_basin(1);
 });
