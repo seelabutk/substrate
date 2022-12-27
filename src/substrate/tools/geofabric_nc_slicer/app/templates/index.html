@@ -10,13 +10,16 @@
 	<html lang="en">
 	
 	<head>
-		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-		</link>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>DCHM</title>
-		<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 
+		<!-- Demo Files -->
+		<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+		
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></link>
 		<script src="{{ url_for('static', filename='js/render.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
 		<!-- src/substrate/tools/nc_slicer/app/static/js/jquery-1.12.4.min.js -->
 		<!-- Core Tapestry JS -->
 		<script src="{{ url_for('static', filename='js/jquery-1.12.4.min.js') }}"></script>
@@ -26,7 +29,6 @@
 		<script src="{{ url_for('static', filename='js/arcball.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/tools.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/tapestry.js') }}"></script>
-		<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 	</head>
 	
 	<body>
@@ -78,18 +80,26 @@
 					<input type="number" id="hour-output" class="date-output" name="hour-output" min="1" max="24" value="1">
 				</div>
 			</div>
-	
 		</div>
-		<div class="done"></div>
+		<!-- <div class="done"></div> -->
+		<!-- hyperimages -->
 		<div class="row">
 			<div class="column">
-				<div class="hyperimage" id="LFBB_input" data-dataset="LFBB_input" data-variable="Accumulated_Precipitation" /> </div>   
+				<div class="hyperimage" id="input_var" data-dataset="LFBB_input" /> </div>   
 			</div>
 			<div class="column">
 				<div class="hyperimage" id="output_var" data-dataset="LFBB_output"  /></div>  
 			</div>
 		</div>
-		<iframe style="display:none" name="hidden-form"></iframe>
+
+		<!-- hyperactions -->
+		<div style="display: block; text-align: center;">
+			<a class="hyperaction" href="#" for="input_var" data-action="link(output_var)">Link</a>
+			<a class="hyperaction" href="#" for="input_var" data-action="unlink(output_var)">Unlink</a>
+			<a class="hyperaction" href="#" for="input_var" data-action="position=-100,10,800">Set camera</a>
+		</div>
+
+
 	</body>
 
 	
