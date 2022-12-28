@@ -1,0 +1,13 @@
+{
+    "geoFilename" : "/data/LPRB.tiff",
+    "dataFilename" : "/data/LPRB-input-interp.nc",
+    "colorMap" : "base",
+    "opacityAttenuation" : 0.5,
+    "cameraPosition" : [0, 255, 255],
+    "elevationScale" : 0.05,
+    "heightWidthScale" : 512,
+    "imageSize" : [1024, 1024],
+    "outputImageFilename" : "temp.jpg",
+    "backgroundColor": [0, 0, 0, 0],
+    "samplesPerPixel": 4
+}
