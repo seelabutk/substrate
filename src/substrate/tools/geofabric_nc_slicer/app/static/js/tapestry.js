@@ -478,7 +478,7 @@
             const timeoutId = setTimeout(function() {
                 console.log('timeout');
                 //window._requests.delete(img);
-            }, 1000);
+            }, 2000);
 	    
             img.onload = function(ev) {
                 clearTimeout(timeoutId);
@@ -503,7 +503,9 @@
 
             window._requests.add(img);
         }
-
+        this.settings.callbacks.forEach(element => {
+            element(this);
+        });
         // Don't rotate linked views if this call is
         // from one of them otherwise it'll be an infinite
         // loop

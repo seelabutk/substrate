@@ -20,7 +20,6 @@
 		<script src="{{ url_for('static', filename='js/render.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
-		<!-- src/substrate/tools/nc_slicer/app/static/js/jquery-1.12.4.min.js -->
 		<!-- Core Tapestry JS -->
 		<script src="{{ url_for('static', filename='js/jquery-1.12.4.min.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/tools.js') }}"></script>
@@ -86,9 +85,13 @@
 		<div class="row">
 			<div class="column">
 				<div class="hyperimage" id="input_var" data-dataset="LFBB_input" /> </div>   
+				<a class="hyperaction" href="#" for="input_var" data-action="play()">Start</a>
+				<a class="hyperaction" href="#" for="input_var" data-action="stop()">Stop</a>
 			</div>
 			<div class="column">
 				<div class="hyperimage" id="output_var" data-dataset="LFBB_output"  /></div>  
+				<a class="hyperaction" href="#" for="output_var" data-action="play()">Start</a>
+				<a class="hyperaction" href="#" for="output_var" data-action="stop()">Stop</a>
 			</div>
 		</div>
 

@@ -1,26 +1,47 @@
 $(document).ready(function(){
-    // function var_callback(obj){
-    //     hyperimg = obj;
-    //     console.log(obj.settings);
-    //     console.log('var_callback here')
-    //     i = 0;
-    //     if (i==0){
-    //         var suffix = "input"
-    //     }
-    //     else{
-    //         var suffix = "output"
-    //     }
-    //     ele = document.getElementById("basin-"+suffix);
-    //     console.log(ele)
-    //     var basin = ele.value+"_"+suffix;
-    //     console.log(basin)
-    //     console.log(hyperimg.settings.variable_list)
-    //     // switch the config to the selected basin ( also sets up the variable list )
-    //     hyperimg.do_action("switch_config(" + basin + ")")
+    /**
+     * Setup callbacks for playing and pausing
+     */
+     function get_date_hour(timestep) {
+        // extract hour and offset from timestep
+        var hour = (timestep+1)%24;
+        var offset = (timestep-hour+1)/24;
 
-    //     // reset input_var variables
-    //     fillOptions(document.getElementById("varname-"+suffix), hyperimg.settings.variable_list)
-    // }
+        // extract year and day offset from offset
+        var day_2016_offset = 366-214
+        offset = offset-day_2016_offset;
+        var day_of_year = (offset % 365);
+        var year_offset = (offset-day_of_year)/365;
+        if (day_of_year < 0) {
+            day_of_year = 365 + day_of_year ;
+            year_offset = year_offset - 1;
+        }
+        day_of_year -= 1;
+
+        // build date from year and day offset
+        var year = year_offset + 2017;
+        var date = new Date(year,0);
+        date.setDate(date.getDate() + day_of_year);
+        return {
+            'date':date.toISOString().substring(0,10), 'hour':hour
+        }
+    }
+
+    function date_change_callback(tapestry){
+        // get the date and hour from the current timestep
+        date_hour = get_date_hour(tapestry.current_timestep);
+
+        // set date and hour selects
+        if (tapestry.element.id =='input_var'){
+            document.getElementById("hour-input").value = date_hour.hour;
+            document.getElementById("date-input").value = date_hour.date;
+        }
+        else if(tapestry.element.id =='output_var'){
+            document.getElementById("hour-output").value = date_hour.hour;
+            document.getElementById("date-output").value = date_hour.date;
+        }
+
+    }
 
     /**
      * Setup tapestry
@@ -28,11 +49,11 @@ $(document).ready(function(){
     $(".hyperimage").tapestry({
         // host: "http://127.0.0.1:8000",
         host: "http://kavir.eecs.utk.edu:8000",
-        n_tiles: 16,
+        n_tiles: 4,
         width: 1024,
         height: 1024,
-        animation_interval: 500,
-        // callbacks: [var_callback]
+        animation_interval: 1000,
+        callbacks: [date_change_callback]
     });
 
     function get_hyperimg(i){
@@ -124,9 +145,15 @@ $(document).ready(function(){
         return time_index;
     }
 
+
     function set_timestep(i){
-        var hour = document.getElementById("hour-input").value;
-        var date = document.getElementById("date-input").value;
+        if (i==0){
+            var hour = document.getElementById("hour-input").value;
+            var date = document.getElementById("date-input").value;
+        }else if(i==1){
+            var hour = document.getElementById("hour-output").value;
+            var date = document.getElementById("date-output").value;
+        }
         var hyperimg = get_hyperimg(i);
         var timestep = get_timestep(date, hour);
         if (!isNaN(timestep)){
