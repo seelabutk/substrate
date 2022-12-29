@@ -75,7 +75,7 @@ button{
 {
     display: block;
     margin: 5px auto;
-    /* border: 1px solid #000000; */
+    border: 1px solid #000000;
     background-color: #ffffff00;
 }
 .keyframes img 
@@ -83,4 +83,20 @@ button{
     display: inline-block;
     width: 150px;
     height: 150px;
+}
+
+.center-icon 
+{
+  text-align: center;
+}
+
+a
+{
+  text-decoration: none;
+}
+
+.material-icons
+{
+  color: #000000;
+  font-size: 40px;
 }

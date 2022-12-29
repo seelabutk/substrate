@@ -15,8 +15,11 @@
 
 		<!-- Demo Files -->
 		<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-		
+		<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"> -->
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></link>
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/tuts.css') }}"></link>
 		<script src="{{ url_for('static', filename='js/render.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
@@ -80,26 +83,85 @@
 				</div>
 			</div>
 		</div>
-		<!-- <div class="done"></div> -->
+
 		<!-- hyperimages -->
 		<div class="row">
+			<!-- INPUT -->
 			<div class="column">
-				<div class="hyperimage" id="input_var" data-dataset="LFBB_input" /> </div>   
-				<a class="hyperaction" href="#" for="input_var" data-action="play()">Start</a>
-				<a class="hyperaction" href="#" for="input_var" data-action="stop()">Stop</a>
+				<!-- input hyperimage -->
+				<div class="hyperimage" id="input_var" data-dataset="LFBB_input"> </div>  
+				<!-- associated hyperactions -->
+				<div class="center-icon">
+					<!-- play animation -->
+					<div class="tooltip">
+						<a class="hyperaction" href="#" for="input_var" id="input-play" data-action="play()" data-title="Play Animation">
+							<i class="material-icons">play_circle_outline</i>
+						</a>
+						<span class="tooltiptext" id="top">Play Animation</span>
+					</div>
+					<!-- pause animation -->
+					<div class="tooltip">
+						<a class="hyperaction" href="#" for="input_var" id="input-pause" data-action="stop()" style="display: none" data-title="Pause Animation">
+							<i class="material-icons">pause_circle_outline</i>
+						</a>
+						<span class="tooltiptext" id="top">Pause Animation</span>
+					</div>
+					<!-- reset camera -->
+					<div class="tooltip">
+						<a class="hyperaction" href="#" for="input_var" data-action="position=-100,10,800">
+							<i class="material-icons">photo_camera</i>
+						</a>
+						<span class="tooltiptext" id="top">Reset Camera</span>
+					</div>
+				</div>
 			</div>
+			<!-- OUTPUT -->
 			<div class="column">
-				<div class="hyperimage" id="output_var" data-dataset="LFBB_output"  /></div>  
-				<a class="hyperaction" href="#" for="output_var" data-action="play()">Start</a>
-				<a class="hyperaction" href="#" for="output_var" data-action="stop()">Stop</a>
+				<!-- output hyperimage -->
+				<div class="hyperimage" id="output_var" data-dataset="LFBB_output"></div>  
+				<!-- associated hyperactions -->
+				<div class="center-icon">
+					<!-- play animation -->
+					<div class="tooltip">
+						<a class="hyperaction" href="#" for="output_var" id="output-play" data-action="play()">
+							<i class="material-icons">play_circle_outline</i>
+						</a>
+						<span class="tooltiptext" id="top">Play Animation</span>
+					</div>
+					<!-- pause animation -->
+					<div class="tooltip">
+						<a class="hyperaction" href="#" for="output_var" id="output-pause" data-action="stop()" style="display: none">
+							<i class="material-icons">pause_circle_outline</i>
+						</a>
+						<span class="tooltiptext" id="top">Pause Animation</span>
+					</div>
+					<!-- reset camera -->
+					<div class="tooltip">
+						<a class="hyperaction" href="#" for="output_var" data-action="position=-100,10,800">
+							<i class="material-icons">photo_camera</i>
+						</a>
+						<span class="tooltiptext" id="top">Reset Camera</span>
+					</div>
+				</div>
 			</div>
 		</div>
 
-		<!-- hyperactions -->
-		<div style="display: block; text-align: center;">
-			<a class="hyperaction" href="#" for="input_var" data-action="link(output_var)">Link</a>
-			<a class="hyperaction" href="#" for="input_var" data-action="unlink(output_var)">Unlink</a>
-			<a class="hyperaction" href="#" for="input_var" data-action="position=-100,10,800">Set camera</a>
+		<!-- link/unlink hyperactions -->
+		<div class="center-icon">
+			<!-- link cameras -->
+			<div class="tooltip">
+				<a class="hyperaction" href="#" for="input_var" data-action="link(output_var)">
+					<i class="material-icons">link</i>
+				</a>
+				<span class="tooltiptext" id="top">Link Cameras</span>
+			</div>
+			<!-- unlink cameras -->
+			<div class="tooltip">
+				<a class="hyperaction" href="#" for="input_var" data-action="unlink(output_var)">
+					<i class="material-icons">link_off</i>
+				</a>
+				<span class="tooltiptext" id="top">Unlink Cameras</span>
+			</div>
 		</div>
 
 
