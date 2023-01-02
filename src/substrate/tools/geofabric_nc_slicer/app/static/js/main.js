@@ -91,7 +91,6 @@ $(document).ready(function(){
     }
     function set_basin(i){
         var hyperimg = get_hyperimg(i);
-        console.log(hyperimg)
         if (i==0){
             var suffix = "input"
         }
@@ -99,17 +98,13 @@ $(document).ready(function(){
             var suffix = "output"
         }
         ele = document.getElementById("basin-"+suffix);
-        console.log(ele)
         var basin = ele.value+"_"+suffix;
-        console.log(basin)
-        console.log(hyperimg.settings.variable_list)
         
         // switch the config to the selected basin ( also sets up the variable list )
         hyperimg.do_action("switch_config(" + basin + ")")
 
         // reset input_var variables
         fillOptions(document.getElementById("varname-"+suffix), hyperimg.settings.variable_list);
-        console.log('rendering after variable set')
         hyperimg.render(0);
     }
 
@@ -127,7 +122,6 @@ $(document).ready(function(){
     function set_variable(val, i){
         var hyperimg = get_hyperimg(i);
         hyperimg.settings.variable=val;
-        console.log('rendering after variable set')
         hyperimg.render(0);
     }
     $(".varname-input").on("input",  function(){ set_variable($(this).val(), 0) });
@@ -185,27 +179,4 @@ $(document).ready(function(){
     set_basin(0);
     set_basin(1);
 
-    /**
-     * Setup dynamic tooltips
-     */
-     $("a").mouseenter(function (e) { //event fired when mouse cursor enters "a" element 
-        var $class_name = $(this).attr("class").slice(13); //get class attribute of "a" element after leaving 13 characters which is equal to "tooltip_link " 
-        var $x = e.pageX - this.offsetLeft; //get mouse X coordinate relative to "a" element 
-        var $tooltip_text = $(this).attr("title"); //get title attribute of "a" element 
-        if ($tooltip_text.length > 0) { //display tooltip only if it has more than zero characters 
-            $(this).append('<div class="tooltip ' + $class_name + '">' + $tooltip_text + '</div>'); //append tooltip markup, insert class name and tooltip title from the values above 
-            $("a > div.tooltip.center").css("left", "" + $x - 103 + "px"); //set tooltip position from left 
-            $("a > div.tooltip.left").css("left", "" + $x + "px"); //set tooltip position from left 
-            $("a > div.tooltip.right").css("left", "" + $x - 208 + "px"); //set tooltip position from left 
-            $("a > div.tooltip." + $class_name).fadeIn(300); //display, animate and fade in the tooltip 
-        }
-    });
-    $("a").mouseleave(function () { //event fired when mouse cursor leaves "a" element 
-        var $class_name = $(this).attr("class").slice(13); //get class attribute of "a" element after leaving 13 characters which is equal to "tooltip_link " 
-        //fade out the tooltip, delay for 300ms and then remove the tooltip and end the custom queue 
-        $("a > div.tooltip." + $class_name).fadeOut(300).delay(300).queue(function () {
-            $(this).remove();
-            $(this).dequeue();
-        });
-    });
 });

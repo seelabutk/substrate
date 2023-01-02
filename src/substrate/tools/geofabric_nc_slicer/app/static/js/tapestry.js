@@ -171,7 +171,6 @@
         var result;
 
         var path = host + "var/" + dataset;
-        console.log("VARS PATH: "+ path);
         $.ajax({
             url: path,
             type: "GET",
@@ -179,7 +178,6 @@
             async: false,
             success: function(response) {
                 result = response;
-                console.log(result);
             },
         });
 
@@ -701,12 +699,7 @@
         }
         else if (operation == 'play')
         {
-            self = this;
-            this.timeseries_timer = setInterval(function(){
-                self.current_timestep = (self.current_timestep + 1) % (self.timerange[1] - self.timerange[0]);
-                self.render(0);
-                // self.render(self.is_drag + 0);
-            }, this.settings.animation_interval);
+            this.timeseries_timer = setInterval(() => this.animation_timer(), this.settings.animation_interval);
         }
         else if (operation == 'stop')
         {
@@ -722,6 +715,10 @@
             this.render(this.get_low_resolution());
         }
 
+    }
+    Tapestry.prototype.animation_timer = function() {
+        this.current_timestep = (this.current_timestep + 1) % (this.timerange[1] - this.timerange[0]);
+        this.render(0);
     }
 
     Tapestry.prototype.smooth_rotate = function(end_p)
