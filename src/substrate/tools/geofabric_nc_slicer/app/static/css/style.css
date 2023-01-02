@@ -2,24 +2,27 @@ html {
   font-family: "Source Sans Pro", Arial, sans-serif;
   margin: 0;
   padding: 0;
+  background: black;
+
 }
 h1 {
-  font-size: 36px;
+  font-size: 42px;
 }
 h2 {
   font-size: 24px;
   background: black;
+  text-align: center;
   color: white;
   margin: 0px;
   padding-left: 20px;
   padding-bottom: 20px;
 }
 body{
-  background-color: white;
+  background-color: black;
 }
 .header {
-    padding: 20px;
-    text-align: left;
+    /* padding: 20px; */
+    text-align: center;
     background: black;
     color: white;
     font-size: 20px;
@@ -30,12 +33,13 @@ footer {
 }
 
 .form{
-    background-color: #000;
-    color: white;
-    text-align: left;
-    padding-left: 20px;
-    padding-bottom: 20px;
-    font-family: "Source Sans Pro", sans-serif;
+  border: 1px solid #ffffff;
+  background-color: #000;
+  color: white;
+  text-align: left;
+  padding-left: 20px;
+  padding-bottom: 20px;
+  font-family: "Source Sans Pro", sans-serif;
 }
 select {
   color: #202020;
@@ -60,12 +64,25 @@ button{
   color: white
 }
 
-.column {
+.column 
+{
   float: left;
-  width: 50%;
+  width: 45%;
+  /* border: 1px solid #ffffff; */
 }
 
-.row:after {
+.center-column 
+{
+  float: left;
+  width: 10%;
+  /* top: 50%; */
+  /* position: relative; */
+  /* transform: translateY(-50%); */
+  /* border: 1px solid #ffffff; */
+}
+
+.row:after 
+{
   content: "";
   display: table;
   clear: both;
@@ -75,8 +92,8 @@ button{
 {
     display: block;
     margin: 5px auto;
-    border: 1px solid #000000;
-    background-color: #ffffff00;
+    border: 1px solid #ffffff;
+    background-color: #ffffff;
 }
 .keyframes img 
 {
@@ -88,6 +105,14 @@ button{
 .center-icon 
 {
   text-align: center;
+  /* border: 1px solid #ffffff; */
+  /* position: absolute;
+  top: 50%;
+  transform: translateY(-50%); */
+}
+.icons
+{
+  text-align: center;
 }
 
 a
@@ -97,6 +122,6 @@ a
 
 .material-icons
 {
-  color: #000000;
+  color: #ffffff;
   font-size: 40px;
 }

@@ -37,10 +37,16 @@
 		<div class="header">
 			<h1>Render DCHM</h1>
 		</div>
+
+		<!-- hyperimages -->
 		<div class="row">
-			<!-- Input Var Form -->
+
+			<!-- INPUT -->
 			<div class="column">
 				<h2>Input Variables</h2>
+				<!-- input hyperimage -->
+				<div class="hyperimage" id="input_var" data-dataset="LFBB_input"> </div> 
+				<!-- input variable selection -->
 				<div class="form">
 					<label for="region-input">Basin: </label>
 					<select name="basin-input" id="basin-input" class="basin-input"> 
@@ -59,39 +65,8 @@
 					<label for="hour-input">Hour:</label>
 					<input type="number" id="hour-input" name="hour-input" class="hour-input" min="1" max="24" value="1">
 				</div>
-			</div>
-			<!-- Output Var Form -->
-			<div class="column">
-				<h2>Output Variables</h2>
-				<div class="form">
-					<label for="region-output">Basin: </label>
-					<select name="basin-output" id="basin-output" class="basin-output">
-						<option value="PRB">PRB</option>
-						<option value="LTTB">LTTB</option>
-						<option value="LFBB" selected>LFBB</option>
-						<option value="LPRB">LPRB</option>
-					</select>
-					<br> 
-					<label for="varname-output">Variable:</label>
-					<select name="vname-output" id="varname-output" class="varname-output"></select>
-					<br> 
-					<label for="date-output">Date:</label>
-					<input type="date" id="date-output" class="date-output" name="date-output" min="2016-08-01" max="2019-12-31" value="2016-08-01">
-					<br> 
-					<label for="hour-output">Hour:</label>
-					<input type="number" id="hour-output" class="date-output" name="hour-output" min="1" max="24" value="1">
-				</div>
-			</div>
-		</div>
-
-		<!-- hyperimages -->
-		<div class="row">
-			<!-- INPUT -->
-			<div class="column">
-				<!-- input hyperimage -->
-				<div class="hyperimage" id="input_var" data-dataset="LFBB_input"> </div>  
-				<!-- associated hyperactions -->
-				<div class="center-icon">
+				<!-- input associated hyperactions -->
+				<div class="icons">
 					<!-- play animation -->
 					<div class="tooltip">
 						<a class="hyperaction" href="#" for="input_var" id="input-play" data-action="play()" data-title="Play Animation">
@@ -115,12 +90,54 @@
 					</div>
 				</div>
 			</div>
+
+			<!-- JOINING INPUT/OUTPUT-->
+			<div class="center-column">
+				<!-- link/unlink hyperactions -->
+				<div class="center-icon">
+					<!-- link cameras -->
+					<div class="tooltip">
+						<a class="hyperaction" href="#" for="input_var" data-action="link(output_var)">
+							<i class="material-icons">link</i>
+						</a>
+						<span class="tooltiptext" id="top">Link Cameras</span>
+					</div>
+					<!-- unlink cameras -->
+					<div class="tooltip">
+						<a class="hyperaction" href="#" for="input_var" data-action="unlink(output_var)">
+							<i class="material-icons">link_off</i>
+						</a>
+						<span class="tooltiptext" id="top">Unlink Cameras</span>
+					</div>
+				</div>
+			</div>
+
 			<!-- OUTPUT -->
 			<div class="column">
+				<h2>Output Variables</h2>
 				<!-- output hyperimage -->
 				<div class="hyperimage" id="output_var" data-dataset="LFBB_output"></div>  
-				<!-- associated hyperactions -->
-				<div class="center-icon">
+				<!-- output variable selection -->
+				<div class="form">
+					<label for="region-output">Basin: </label>
+					<select name="basin-output" id="basin-output" class="basin-output">
+						<option value="PRB">PRB</option>
+						<option value="LTTB">LTTB</option>
+						<option value="LFBB" selected>LFBB</option>
+						<option value="LPRB">LPRB</option>
+					</select>
+					<br> 
+					<label for="varname-output">Variable:</label>
+					<select name="vname-output" id="varname-output" class="varname-output"></select>
+					<br> 
+					<label for="date-output">Date:</label>
+					<input type="date" id="date-output" class="date-output" name="date-output" min="2016-08-01" max="2019-12-31" value="2016-08-01">
+					<br> 
+					<label for="hour-output">Hour:</label>
+					<input type="number" id="hour-output" class="date-output" name="hour-output" min="1" max="24" value="1">
+				</div>
+				<!-- output associated hyperactions -->
+				<div class="icons">
 					<!-- play animation -->
 					<div class="tooltip">
 						<a class="hyperaction" href="#" for="output_var" id="output-play" data-action="play()">
@@ -145,26 +162,6 @@
 				</div>
 			</div>
 		</div>
-
-		<!-- link/unlink hyperactions -->
-		<div class="center-icon">
-			<!-- link cameras -->
-			<div class="tooltip">
-				<a class="hyperaction" href="#" for="input_var" data-action="link(output_var)">
-					<i class="material-icons">link</i>
-				</a>
-				<span class="tooltiptext" id="top">Link Cameras</span>
-			</div>
-			<!-- unlink cameras -->
-			<div class="tooltip">
-				<a class="hyperaction" href="#" for="input_var" data-action="unlink(output_var)">
-					<i class="material-icons">link_off</i>
-				</a>
-				<span class="tooltiptext" id="top">Unlink Cameras</span>
-			</div>
-		</div>
-
-
 	</body>
 
 	
