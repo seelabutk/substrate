@@ -1,20 +1,5 @@
 $(document).ready(function(){
-    /**
-     * Setup toggle logic for playing and pausing
-     */
-    $('#input-play').click(function() {
-        $('#input-play').toggle(); $('#input-pause').toggle();
-    })
-    $('#input-pause').click(function() {
-        $('#input-play').toggle(); $('#input-pause').toggle();
-    })
-    $('#output-play').click(function() {
-        $('#output-play').toggle(); $('#output-pause').toggle();
-    })
-    $('#output-pause').click(function() {
-        $('#output-play').toggle(); $('#output-pause').toggle();
-    })
-    
+
     /**
      * Setup callbacks for playing and pausing
      */
@@ -179,4 +164,31 @@ $(document).ready(function(){
     set_basin(0);
     set_basin(1);
 
+    /**
+     * Setup toggle logic for playing and pausing
+     */
+    //  $('#input-play').click(function() {
+    //     $('#input-play').toggle(); $('#input-pause').toggle();
+    // })
+    // $('#input-pause').click(function() {
+    //     $('#input-play').toggle(); $('#input-pause').toggle();
+    // })
+    // $('#output-play').click(function() {
+    //     $('#output-play').toggle(); $('#output-pause').toggle();
+    // })
+    // $('#output-pause').click(function() {
+    //     $('#output-play').toggle(); $('#output-pause').toggle();
+    // })
+    $('#play').click(function() {
+        $('#play').toggle(); $('#pause').toggle();
+        var hyperimg;
+        hyperimg = get_hyperimg(0); hyperimg.do_action("play()")
+        hyperimg = get_hyperimg(1); hyperimg.do_action("play()")
+    })
+    $('#pause').click(function() {
+        $('#play').toggle(); $('#pause').toggle();
+        var hyperimghyperimage;
+        hyperimg = get_hyperimg(0); hyperimg.do_action("stop()")
+        hyperimg = get_hyperimg(1); hyperimg.do_action("stop()")
+    })
 });
