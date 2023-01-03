@@ -149,7 +149,7 @@
 
     /**
      * Sets up this list of variables that can be used with the given dataset.
-     * Queries the server endpoint for the list of variables. and number of timesteps
+     * Queries the server endpoint for the list of variables, and number of timesteps
      */
     Tapestry.prototype.setup_variables = function()
     {
