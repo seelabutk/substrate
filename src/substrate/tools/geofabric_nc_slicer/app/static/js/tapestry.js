@@ -312,7 +312,7 @@
         if (typeof tileid == 'undefined')
         {
             tiling = false;
-        }
+        } 
 
         var m = $M(this.camera.Transform);
         m = m.inverse();
@@ -370,6 +370,7 @@
             options["filters"] = this.settings.filters.join("-");
         }
 
+
         // convert the options dictionary to a string
         var options_str = "";
         if (options.hasOwnProperty("timestep"))
@@ -378,6 +379,24 @@
             options_str += "timestep," + options["timestep"] + ",";
 
         }
+
+        // determine quality of the image to be requested
+        var quality = imagesize;
+        if (imagesize == 0)
+        {
+            quality = this.settings.width;
+        }
+
+        // determines the number of frames to be renderered
+        if (quality > this.get_low_resolution()){
+            options["frames"] = 12;
+        }
+        else
+        {
+            options["frames"] = 5;
+        }
+
+        // build options string
         for (var i in options)
         {
             if (i != "timestep")
@@ -385,15 +404,10 @@
         }
         options_str = options_str.substring(0, options_str.length - 1);
 
-        var quality = imagesize;
-        if (imagesize == 0)
-        {
-            quality = this.settings.width;
-        }
-
         var host;
         if (this.settings.host.constructor === Array)
         {
+            // TODO - why request a random host?
             var random = Math.floor(Math.random() 
                     * this.settings.host.length);
             host = this.settings.host[random] + "/";
@@ -770,6 +784,8 @@
         });
 
         $(this.element).on("mousemove", function(event){
+            // console.log(event.originalEvent)
+            // console.log(event.which)
             self.canceler = (self.canceler + 1) % 1000;
             if (self.canceler % 5 == 0)
             {
