@@ -51,8 +51,8 @@ $(document).ready(function(){
         // host: "http://127.0.0.1:8000",
         host: "http://kavir.eecs.utk.edu:8000",
         n_tiles: 4,
-        width: 1024,
-        height: 1024,
+        width: 512,
+        height: 512,
         animation_interval: 1000,
         callbacks: [date_change_callback]
     });

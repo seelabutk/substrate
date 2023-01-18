@@ -393,7 +393,7 @@
         }
         else
         {
-            options["frames"] = 5;
+            options["frames"] = 7;
         }
 
         // build options string
@@ -432,7 +432,7 @@
      * @param {bool} remote_call - determines if this is called remotely from 
      * another hyperimage instance (used internally). Leave as undefined. 
      */
-    Tapestry.prototype.render = function(imagesize, remote_call)
+     Tapestry.prototype.render = async function(imagesize, remote_call)
     {
         if (typeof remote_call === 'undefined')
         {
@@ -468,6 +468,8 @@
                 return Math.abs(y) < 0.15 * n_cols;
             });
         }
+
+        // TODO - is this sort needed
         var seed = new Array(n_tiles).fill(0).map(function(d, i, arr) {
             const x = i % n_cols - (n_cols/2|0) + 0.5,
                 y = (i / n_cols|0) - (n_cols/2|0) + 0.5,
@@ -476,45 +478,43 @@
         });
         tiles.sort(function(a, b) { return seed[a] - seed[b]; });
 
-        var requests = [];
+        const promises = [];
+        const srcs = [];
         for (let i of tiles)
         {
             var path = this.make_request(imagesize, i);
-            const img = new Image();
-            var self = this;
-            img.tileid = i.toString();
+            srcs.push([i, path]);
+            const promise = new Promise((resolve, reject) => {
+                const img = new Image();
+                img.tileid = i.toString();
+                img.onload = function(ev) {
+                    window._requests.delete(img);
+                    resolve(img);
+                };
+                img.onerror = function(ev) {
+                    window._requests.delete(img);
+                    reject(img);
+                };
+                img.src = path;
+                window._requests.add(img);
+            })
 
-            // store timings in the log
-            this.timelog[path.slice(path.indexOf("/image/"))] = [Date.now(), imagesize, false, 0];
-
-            const timeoutId = setTimeout(function() {
-                console.log('timeout');
-                //window._requests.delete(img);
-            }, 2000);
-	    
-            img.onload = function(ev) {
-                clearTimeout(timeoutId);
-                var image_path = ev.target.src.slice(
-                    ev.target.src.indexOf("/image/"));
-
-                var tile = $(self.element)
-                    .find("#tapestry-tile-" + i).eq(0);
-                if (self.timelog.hasOwnProperty(image_path))
-                {
-                    self.timelog[image_path][3] = Date.now();
-                    self.timelog[image_path][2] = tile.attr("src") === ev.target.src;
-                }
-                
-                window._requests.delete(ev.target);
-            }
-            img.src = path;
-
-            var tile = $(this.element)
-                .find("#tapestry-tile-" + i).eq(0);
-            tile.attr("src", path);
-
-            window._requests.add(img);
+            promises.push(promise.then(() => {
+                promises[i] = null;
+            }));
         }
+        for (let i of tiles) {
+            await Promise.any(promises.filter((d) => d !== null));
+        }
+        // this.request_wait(tiles, promises);
+
+        for (let i of tiles) {
+            var tile = $(this.element)
+                .find("#tapestry-tile-" + srcs[i][0]).eq(0);
+            tile.attr("src", srcs[i][1]);
+        }
+
+        // allow for callbacks as needed
         this.settings.callbacks.forEach(element => {
             element(this);
         });
@@ -530,6 +530,13 @@
         }
 
     }
+
+
+    // Tapestry.prototype.request_wait = async function(tiles, promises) {
+    //     for (let i of tiles) {
+    //         await Promise.any(promises.filter((d) => d !== null));
+    //     }
+    // }
 
     /**
      * Sends a single render request and doesn't support tiling
@@ -732,7 +739,7 @@
     }
     Tapestry.prototype.animation_timer = function() {
         this.current_timestep = (this.current_timestep + 1) % (this.timerange[1] - this.timerange[0]);
-        this.render(0);
+        this.render(0, true);
     }
 
     Tapestry.prototype.smooth_rotate = function(end_p)
