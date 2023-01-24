@@ -8,7 +8,7 @@ class NetCDFSlicer(Tool):
 	def __init__(self, config, data_sources):
 		super().__init__(config, data_sources)
 
-		self.name = 'nc_slicer'
+		self.name = 'nc-slicer'
 		self.port = 8000
 
 		self.config = config
@@ -27,7 +27,7 @@ class NetCDFSlicer(Tool):
 	def start(self):
 		mounts = super().start()
 		docker = from_env()
-
+		self.port = self.config['docker'].get('port', self.port)
 		docker.services.create(
 			'seelab/substrate-nc-slicer',
 			endpoint_spec=EndpointSpec(ports={self.port: (5000, 'tcp')}),
