@@ -1,8 +1,9 @@
-data:
-  source:
-    - ../data/apple
-
-
-docker:
-  port: 8000
-  replicas: 3
+nc_slicer:
+  internalPort: 5000
+  data:
+    source:
+      - /home/zavier/Documents/research/seelab/data/DHCM/input_var
+  docker:
+    image: 'seelab/substrate-nc-slicer'
+    port: 8000
+    replicas: 3
