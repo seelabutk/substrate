@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 import yaml
 
 from .targets import AWSStack, DockerSwarm
-from .tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid
+from .tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid, GenericTool
 
 TOOLS = {
 	'hello-world': HelloWorld,
@@ -25,6 +25,8 @@ class Substrate():
 		self.path, self.config = self._parse_yaml(path)
 		self._check_config()
 
+		self.config = self.config[self.tool_name]
+
 		self.target = None
 		if self.config.get('aws', None) is not None:
 			self.target = AWSStack
@@ -34,12 +36,15 @@ class Substrate():
 		self.data_sources = self._get_data(self.config)
 		if tool_name not in TOOLS:
 			raise Exception(f'No tool named {tool_name}')
-		self.tool = TOOLS[tool_name](self.config, self.data_sources)
+		self.tool = GenericTool(tool_name, self.config, self.data_sources)
 
 		self.target_obj = self.target(self.path, self.config, self.tool)
 
 	def _check_config(self):
-		config = self.config
+		if self.tool_name not in self.config:
+			raise Exception(f'Tool "{ self.tool_name }" not defined in config.')
+
+		config = self.config[self.tool_name]
 
 		if 'aws' not in config and 'docker' not in config:
 			raise Exception(
@@ -61,6 +66,9 @@ class Substrate():
 				raise Exception(
 					'AWS_SECRET_ACCESS_KEY environment variable must be set to deploy to AWS.'
 				)
+			
+			if not 'service_command' in config['aws']:
+				raise Exception('Option "aws.service_command" must be set to deploy to AWS.')
 
 		if 'docker' in config:
 			try:
