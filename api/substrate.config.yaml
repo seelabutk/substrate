@@ -1,41 +1,46 @@
-### Define the data source
-data:
-  source: REQUIRED - a list of paths or URLs pointing to the data to use
-    - /path/to/data
-    - /path/to/data/dataset.dat
-    - https://data.com/dataset.dat
-  target: REQUIRED if using a local deployment and a URL data source - where to place the downloaded data on the local file system
+### Define the service
+service_name:
+  internalPort: REQUIRED - the internal port used to access the service
+  ### Define the data source
+  data:
+    source: REQUIRED - a list of paths or URLs pointing to the data to use
+      - /path/to/data
+      - /path/to/data/dataset.dat
+      - https://data.com/dataset.dat
+    target: REQUIRED if using a local deployment and a URL data source - where to place the downloaded data on the local file system
 
 
-### Local deployment
-### Each node should have Docker Engine installed.
-docker:
-  port: OPTIONAL - the port to be expose the Docker service on
-  replicas: OPTIONAL - the number of replicas the Docker swarm should use
-  advertise_addr: REQUIRED if using multiple local nodes - the IP:PORT to use to add nodes to the swarm
-  managers: OPTIONAL - Addresses of nodes that should be added to the swarm as managers
-    - manager2.com
-    - ip.of.manager.3
-  workers: OPTIONAL - Addresses of nodes that should be added to the swarm as workers
-    - ip.of.worker.1
-    - worker2.ai
-    - ip.of.worker.3
+  ### Local deployment
+  ### Each node should have Docker Engine installed.
+  docker:
+    image: REQIURED - the docker image of the service that will run when the service is started
+    port: OPTIONAL - the port to be expose the Docker service on
+    replicas: OPTIONAL - the number of replicas the Docker swarm should use
+    advertise_addr: REQUIRED if using multiple local nodes - the IP:PORT to use to add nodes to the swarm
+    managers: OPTIONAL - Addresses of nodes that should be added to the swarm as managers
+      - manager2.com
+      - ip.of.manager.3
+    workers: OPTIONAL - Addresses of nodes that should be added to the swarm as workers
+      - ip.of.worker.1
+      - worker2.ai
+      - ip.of.worker.3
 
 
-### AWS deployment
-aws:
-  ami: REQUIRED if you don't have access to SSM - the ID of the Amazon Machine Image to use
-  https: OPTIONAL (default: false) - should the container deploy an Application Load Balancer in front of the EC2 instance? You will need to add your own SSL cert to the balancer before HTTPS will work.
-  region: REQUIRED - the region to deploy to
-  replicas: OPTIONAL - the number of replicas the Docker swarm should use
-  role_arn: REQUIRED if you don't have access to create IAM roles - the role ARN of the IAM role you want to use to deploy
-  save_logs: OPTIONAL (default: true) - sync the EC2 leader's cloud-init logs to S3 after each command
-  managers: REQUIRED - list of the type and count of EC2 instances to use as managers
-    't3.micro': 1
-  workers: OPTIONAL - list of the type and count of EC2 instances to use as workers
-    't3.micro': 3
+  ### AWS deployment
+  aws:
+    ami: REQUIRED if you don't have access to SSM - the ID of the Amazon Machine Image to use
+    service_command: REQUIRED - the service command to use when running on AWS
+    https: OPTIONAL (default: false) - should the container deploy an Application Load Balancer in front of the EC2 instance? You will need to add your own SSL cert to the balancer before HTTPS will work.
+    region: REQUIRED - the region to deploy to
+    replicas: OPTIONAL - the number of replicas the Docker swarm should use
+    role_arn: REQUIRED if you don't have access to create IAM roles - the role ARN of the IAM role you want to use to deploy
+    save_logs: OPTIONAL (default: true) - sync the EC2 leader's cloud-init logs to S3 after each command
+    managers: REQUIRED - list of the type and count of EC2 instances to use as managers
+      't3.micro': 1
+    workers: OPTIONAL - list of the type and count of EC2 instances to use as workers
+      't3.micro': 3
 
-### Tool settings
+### Tool specific settings (TODO: figure out how to make this work with generic tool)
 tapestry:
   directory: OPTIONAL - directory containing files needed for Tapestry to run
 
