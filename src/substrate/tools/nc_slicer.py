@@ -17,7 +17,7 @@ class NetCDFSlicer(Tool):
 		self.service_command = (
 			'docker service create '
 			'--name dchm '
-			'--publish 80:5000/tcp '
+			'--publish 5000:5000/tcp '
 			f'--replicas {self.config.get("aws", {}).get("replicas", 1)} '
 			'--mount type=bind,src=/mnt/efs/data,dst=/data '
 			'seelab/substrate-nc-slicer'

@@ -35,10 +35,11 @@ class DockerSwarm():
 			pass
 		self.log('✓\n')
 
-		self.network = self.docker.networks.create(
-			f'substrate-{self.tool.name}-net',
-			driver='overlay'
-		)
+		if (self.docker.networks.list(names=[f'substrate-{self.tool.name}-net']) == []):
+			self.network = self.docker.networks.create(
+				f'substrate-{self.tool.name}-net',
+				driver='overlay'
+			)
 
 		manager_token = self.docker.swarm.attrs['JoinTokens']['Manager']
 		worker_token = self.docker.swarm.attrs['JoinTokens']['Worker']
