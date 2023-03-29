@@ -1,0 +1,11 @@
+nc-slicer:
+  internalPort: 5000
+  image: 'seelab/substrate-nc-slicer'
+
+data:
+  source:
+    - ../../../data/DHCM/input_var
+docker:
+  port: 8000
+  replicas: 3
+
