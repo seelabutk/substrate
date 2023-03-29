@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 import yaml
 
 from .targets import AWSStack, DockerSwarm
-from .tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid
+from .tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid, GenericTool
 
 TOOLS = {
 	'hello-world': HelloWorld,
@@ -33,8 +33,13 @@ class Substrate():
 
 		self.data_sources = self._get_data(self.config)
 		if tool_name not in TOOLS:
-			raise Exception(f'No tool named {tool_name}')
-		self.tool = TOOLS[tool_name](self.config, self.data_sources)
+			# look in config for tool
+			if tool_name not in self.config:
+				raise Exception(f'No tool named {tool_name}')
+			else:
+				self.tool = GenericTool(tool_name, self.config, self.data_sources)
+		else:
+				self.tool = TOOLS[tool_name](self.config, self.data_sources)
 
 		self.target_obj = self.target(self.path, self.config, self.tool)
 
@@ -61,6 +66,9 @@ class Substrate():
 				raise Exception(
 					'AWS_SECRET_ACCESS_KEY environment variable must be set to deploy to AWS.'
 				)
+			
+			if not 'service_command' in config['aws']:
+				raise Exception('Option "aws.service_command" must be set to deploy to AWS.')
 
 		if 'docker' in config:
 			try:
