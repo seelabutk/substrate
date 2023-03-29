@@ -1,5 +1,5 @@
-nc-slicer:
-  internalPort: 5000
+nc_slicer_generic:
+  internal_port: 5000
   image: 'seelab/substrate-nc-slicer'
 
 data:

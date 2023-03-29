@@ -1,8 +1,10 @@
-### Define the service
-service_name:
-  internalPort: REQUIRED - the internal port used to access the service
+### Generic service
+[service_name]:
+  internal_port: REQUIRED - the internal port used to access the service
   service_command: REQUIRED when 'aws' is defined - the service command to use when running on AWS
   image: REQUIRED when 'docker' is defined - the image to use when running on Docker
+
+
 ### Define the data source
 data:
   source: REQUIRED - a list of paths or URLs pointing to the data to use
