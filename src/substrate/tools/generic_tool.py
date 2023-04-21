@@ -35,7 +35,7 @@ class GenericTool(Tool):
 		arguments = self.config.get('args', [])
 		docker.services.create(
 			self.image,
-			endpoint_spec=EndpointSpec(ports={self.port: (self.internal_port, 'tcp')}),
+			endpoint_spec=EndpointSpec(ports={self.port: (self.internal_port, 'tcp', 'host')}),
 			mode=ServiceMode(
 				mode='replicated',
 				replicas=self.config['docker'].get('replicas', 1)
