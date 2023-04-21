@@ -4,6 +4,8 @@ import os
 import subprocess
 import sys
 from urllib.parse import urlparse
+import json
+import copy
 
 import yaml
 
@@ -18,11 +20,24 @@ TOOLS = {
 	'braid': Braid
 }
 
+def deepMerge(a, b):
+    r = copy.deepcopy(a)
+    for key, val in b.items():
+        if key in r and isinstance(r[key], dict) and isinstance(val, dict):
+            r[key] = deepMerge(r[key], val)
+        else:
+            r[key] = val
+    return r
 
 class Substrate():
-	def __init__(self, tool_name, path=None):
+	def __init__(self, tool_name, config, path=None):
+		pathconfig = {}
+		if path:
+			path, pathconfig = parse_yaml(path)
+		
 		self.tool_name = tool_name
-		self.path, self.config = self._parse_yaml(path)
+		self.config = deepMerge(pathconfig, config)
+		self.path = path
 		self._check_config()
 
 		self.target = None
@@ -85,7 +100,7 @@ class Substrate():
 				) from exc
 
 	def _get_data(self, config):
-		source_paths = config['data']['source']
+		source_paths = config.get('data', {}).get('source', [])
 		data_paths = []
 		data_urls = []
 
@@ -108,28 +123,31 @@ class Substrate():
 
 		return (data_paths, data_urls)
 
-	def _parse_yaml(self, path):
-		config_name = 'substrate.config.yaml'
 
-		if path is None:
-			path = os.getcwd()
-
-			files = os.listdir(path)
-			if config_name not in files:
-				raise FileNotFoundError(config_name)
-
-			path = os.path.join(path, config_name)
-
-		with open(path, 'r', encoding='utf8') as stream:
-			_config = yaml.load(stream, Loader=yaml.Loader)
-
-		return (path, _config)
 
 	def start(self):
 		return f'http://{self.target_obj.start()}'
 
 	def stop(self):
 		self.target_obj.stop()
+		
+
+def parse_yaml(path):
+	config_name = 'substrate.config.yaml'
+
+	if path is None:
+		path = os.getcwd()
+
+		files = os.listdir(path)
+		if config_name not in files:
+			raise FileNotFoundError(config_name)
+
+		path = os.path.join(path, config_name)
+
+	with open(path, 'r', encoding='utf8') as stream:
+		_config = yaml.load(stream, Loader=yaml.Loader)
+
+	return (path, _config)
 
 
 def main():
@@ -145,13 +163,21 @@ def main():
 		help='[start, stop]',
 		metavar='ACTION'
 	)
-	parser.add_argument('-c', '--config', dest='path')
+	parser.add_argument('-i', '--input' , dest='input_config', default='{}', type=str, nargs='?', const=1)
+	parser.add_argument('-p', '--path'  , dest='path')
 	args = parser.parse_args()
 
 	if args.action not in ['start', 'stop', 'synth']:
 		sys.exit('Invalid action specified.')
+		
+	tool = args.tool
+	path = args.path
+	config = json.loads(args.input_config)
+	
+	if (not bool(config)) and (path is None):
+		sys.exit('no config file specified')
 
-	substrate = Substrate(args.tool, args.path)
+	substrate = Substrate(tool, config, path)
 	if args.action == 'start':
 		print(f'You may view your new visualization stack here: {substrate.start()}.')  # noqa: E501
 
