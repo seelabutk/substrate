@@ -21,13 +21,13 @@ TOOLS = {
 }
 
 def deep_merge(a, b):
-    r = copy.deepcopy(a)
-    for key, val in b.items():
-        if key in r and isinstance(r[key], dict) and isinstance(val, dict):
-            r[key] = deep_merge(r[key], val)
-        else:
-            r[key] = val
-    return r
+	r = copy.deepcopy(a)
+	for key, val in b.items():
+		if key in r and isinstance(r[key], dict) and isinstance(val, dict):
+			r[key] = deep_merge(r[key], val)
+		else:
+			r[key] = val
+	return r
 
 class Substrate():
 	def __init__(self, tool_name, config, path=None):
