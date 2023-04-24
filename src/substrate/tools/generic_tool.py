@@ -4,7 +4,7 @@ from docker.types.services import EndpointSpec, ServiceMode
 from . import Tool
 
 
-class GenericTool(Tool):
+class GenericTool(Tool):  # pylint: disable=too-many-instance-attributes
 	def __init__(self, name, config, data_sources):
 		super().__init__(config, data_sources)
 		# Provide a name for this tool
@@ -26,7 +26,10 @@ class GenericTool(Tool):
 	def start(self):
 		# ensure image is defined
 		if self.image is None:
-			raise Exception('Option "docker.image" must be defined when running substrate generic tool locally.')
+			raise Exception(
+				'Option "docker.image" must be defined when running substrate generic '
+				'tool locally.'
+			)
 
 		mounts = super().start()
 		docker = from_env()
@@ -35,7 +38,9 @@ class GenericTool(Tool):
 		arguments = self.config.get('args', [])
 		docker.services.create(
 			self.image,
-			endpoint_spec=EndpointSpec(ports={self.port: (self.internal_port, 'tcp', 'host')}),
+			endpoint_spec=EndpointSpec(
+				ports={self.port: (self.internal_port, 'tcp', 'host')}
+			),
 			mode=ServiceMode(
 				mode='replicated',
 				replicas=self.config['docker'].get('replicas', 1)

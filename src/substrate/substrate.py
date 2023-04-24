@@ -10,7 +10,14 @@ import copy
 import yaml
 
 from .targets import AWSStack, DockerSwarm
-from .tools import HelloWorld, NetCDFSlicer, OSPRayStudio, Tapestry, Braid, GenericTool
+from .tools import (
+	HelloWorld,
+	NetCDFSlicer,
+	OSPRayStudio,
+	Tapestry,
+	Braid,
+	GenericTool
+)
 
 TOOLS = {
 	'hello-world': HelloWorld,
@@ -20,21 +27,43 @@ TOOLS = {
 	'braid': Braid
 }
 
-def deep_merge(a, b):
-	r = copy.deepcopy(a)
-	for key, val in b.items():
-		if key in r and isinstance(r[key], dict) and isinstance(val, dict):
-			r[key] = deep_merge(r[key], val)
+
+def deep_merge(obj_a, obj_b):
+	new_obj = copy.deepcopy(obj_a)
+	for key, val in obj_b.items():
+		if (
+			key in new_obj and isinstance(new_obj[key], dict) and isinstance(val, dict)
+		):
+			new_obj[key] = deep_merge(new_obj[key], val)
 		else:
-			r[key] = val
-	return r
+			new_obj[key] = val
+	return new_obj
+
+
+def parse_yaml(path):
+	config_name = 'substrate.config.yaml'
+
+	if path is None:
+		path = os.getcwd()
+
+		files = os.listdir(path)
+		if config_name not in files:
+			raise FileNotFoundError(config_name)
+
+		path = os.path.join(path, config_name)
+
+	with open(path, 'r', encoding='utf8') as stream:
+		_config = yaml.load(stream, Loader=yaml.Loader)
+
+	return (path, _config)
+
 
 class Substrate():
 	def __init__(self, tool_name, config, path=None):
 		pathconfig = {}
 		if path:
 			path, pathconfig = parse_yaml(path)
-		
+
 		self.tool_name = tool_name
 		self.config = deep_merge(pathconfig, config)
 		self.path = path
@@ -51,10 +80,10 @@ class Substrate():
 			# look in config for tool
 			if tool_name not in self.config:
 				raise Exception(f'No tool named {tool_name}')
-			else:
-				self.tool = GenericTool(tool_name, self.config, self.data_sources)
+
+			self.tool = GenericTool(tool_name, self.config, self.data_sources)
 		else:
-				self.tool = TOOLS[tool_name](self.config, self.data_sources)
+			self.tool = TOOLS[tool_name](self.config, self.data_sources)
 
 		self.target_obj = self.target(self.path, self.config, self.tool)
 
@@ -81,9 +110,11 @@ class Substrate():
 				raise Exception(
 					'AWS_SECRET_ACCESS_KEY environment variable must be set to deploy to AWS.'
 				)
-			
-			if not 'service_command' in config['aws']:
-				raise Exception('Option "aws.service_command" must be set to deploy to AWS.')
+
+			if 'service_command' not in config['aws']:
+				raise Exception(
+					'Option "aws.service_command" must be set to deploy to AWS.'
+				)
 
 		if 'docker' in config:
 			try:
@@ -123,31 +154,11 @@ class Substrate():
 
 		return (data_paths, data_urls)
 
-
-
 	def start(self):
 		return f'http://{self.target_obj.start()}'
 
 	def stop(self):
 		self.target_obj.stop()
-		
-
-def parse_yaml(path):
-	config_name = 'substrate.config.yaml'
-
-	if path is None:
-		path = os.getcwd()
-
-		files = os.listdir(path)
-		if config_name not in files:
-			raise FileNotFoundError(config_name)
-
-		path = os.path.join(path, config_name)
-
-	with open(path, 'r', encoding='utf8') as stream:
-		_config = yaml.load(stream, Loader=yaml.Loader)
-
-	return (path, _config)
 
 
 def main():
@@ -163,17 +174,25 @@ def main():
 		help='[start, stop]',
 		metavar='ACTION'
 	)
-	parser.add_argument('-c', '--config' , dest='input_config', default='{}', type=str, nargs='?', const=1)
-	parser.add_argument('-f', '--config-file'  , dest='path')
+	parser.add_argument(
+		'-c',
+		'--config',
+		dest='input_config',
+		default='{}',
+		type=str,
+		nargs='?',
+		const=1
+	)
+	parser.add_argument('-f', '--config-file', dest='path')
 	args = parser.parse_args()
 
 	if args.action not in ['start', 'stop', 'synth']:
 		sys.exit('Invalid action specified.')
-		
+
 	tool = args.tool
 	path = args.path
 	config = json.loads(args.input_config)
-	
+
 	if (not bool(config)) and (path is None):
 		sys.exit('no config file specified')
 
