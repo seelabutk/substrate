@@ -53,11 +53,19 @@ Valid tool names:
 
 Substrate is configured using `substrate.config.yaml`. The tool will look for this file starting in your current working directory then look for it in parent folders. You can also provide a path with
 
-	substrate tapestry start -c /path/to/substrate.config.yaml
+	substrate tapestry start -f /path/to/substrate.config.yaml
 
 or
 
-	stack = Substrate('tool_name', path='path/to/substrate.config.yaml')
+	stack = Substrate('tool_name', {}, path='path/to/substrate.config.yaml')
+
+You may also specify the config directly via JSON/a dictionary with
+
+	substrate tapestry start -c "{ config here... }"
+
+or
+
+	stack = Substrate('tool_name', config)
 
 The options for the configuration file can be found [here](api/substrate.config.yaml).
 
