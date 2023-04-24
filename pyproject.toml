@@ -1,6 +1,6 @@
 [project]
 name = "seelabutk-substrate"
-authors = [{name = "John Duggan", email = "jduggan1@vols.utk.edu"}]
+authors = [{name = "John Duggan", email = "jduggan1@utk.edu"}]
 classifiers = [
 	"Programming Language :: Python :: 3",
 	"Operating System :: OS Independent"
@@ -18,7 +18,7 @@ entry-points = {console_scripts = {substrate = "substrate.substrate:main"}}
 license = {text = "CC-BY-4.0"}
 readme = "README.md"
 requires-python = ">=3.7"
-version = "1.7.1"
+version = "1.7.2"
 
 [project.urls]
 Homepage = "https://github.com/seelabutk/substrate/"
