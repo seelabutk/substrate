@@ -23,7 +23,7 @@ class Tool():
 				mounts.append(
 					Mount(f'/data/{index}', data_path, type='bind', read_only=True)
 				)
-		else:
+		elif len(data_paths) == 1:
 			mounts.append(Mount('/data', data_paths[0], type='bind', read_only=True))
 
 		return mounts

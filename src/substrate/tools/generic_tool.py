@@ -31,13 +31,17 @@ class GenericTool(Tool):
 		mounts = super().start()
 		docker = from_env()
 		self.port = self.config['docker'].get('port', self.port)
+		environment_variables = self.config['docker'].get('env', [])
+		arguments = self.config.get('args', [])
 		docker.services.create(
 			self.image,
-			endpoint_spec=EndpointSpec(ports={self.port: (self.internal_port, 'tcp')}),
+			endpoint_spec=EndpointSpec(ports={self.port: (self.internal_port, 'tcp', 'host')}),
 			mode=ServiceMode(
 				mode='replicated',
 				replicas=self.config['docker'].get('replicas', 1)
 			),
+			args=arguments,
+			env=environment_variables,
 			mounts=mounts,
 			name=self.name,
 			networks=[f'substrate-{self.name}-net'],
