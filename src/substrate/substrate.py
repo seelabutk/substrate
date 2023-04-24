@@ -20,11 +20,11 @@ TOOLS = {
 	'braid': Braid
 }
 
-def deepMerge(a, b):
+def deep_merge(a, b):
     r = copy.deepcopy(a)
     for key, val in b.items():
         if key in r and isinstance(r[key], dict) and isinstance(val, dict):
-            r[key] = deepMerge(r[key], val)
+            r[key] = deep_merge(r[key], val)
         else:
             r[key] = val
     return r
@@ -36,7 +36,7 @@ class Substrate():
 			path, pathconfig = parse_yaml(path)
 		
 		self.tool_name = tool_name
-		self.config = deepMerge(pathconfig, config)
+		self.config = deep_merge(pathconfig, config)
 		self.path = path
 		self._check_config()
 
@@ -163,8 +163,8 @@ def main():
 		help='[start, stop]',
 		metavar='ACTION'
 	)
-	parser.add_argument('-i', '--input' , dest='input_config', default='{}', type=str, nargs='?', const=1)
-	parser.add_argument('-p', '--path'  , dest='path')
+	parser.add_argument('-c', '--config' , dest='input_config', default='{}', type=str, nargs='?', const=1)
+	parser.add_argument('-f', '--config-file'  , dest='path')
 	args = parser.parse_args()
 
 	if args.action not in ['start', 'stop', 'synth']:
