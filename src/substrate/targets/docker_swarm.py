@@ -15,6 +15,10 @@ class DockerSwarm():
 		self.tool = tool
 
 		self.docker = from_env()
+		self.network_name = self.config['docker'].get(
+			'network',
+			'substrate-{self.tool.name}-net'
+		)
 		self.network = None
 
 		ssh_dir = os.path.join(Path.home(), '.ssh')
@@ -35,10 +39,14 @@ class DockerSwarm():
 			pass
 		self.log('✓\n')
 
-		self.network = self.docker.networks.create(
-			f'substrate-{self.tool.name}-net',
-			driver='overlay'
-		)
+		networks = self.docker.networks.list(names=[self.network_name])
+		if networks:
+			self.network = networks[0]
+		else:
+			self.network = self.docker.networks.create(
+				self.network_name,
+				driver='overlay'
+			)
 
 		manager_token = self.docker.swarm.attrs['JoinTokens']['Manager']
 		worker_token = self.docker.swarm.attrs['JoinTokens']['Worker']
@@ -125,8 +133,11 @@ class DockerSwarm():
 					self.log('✓\n')
 
 		self.log('Removing the swarm service…')
-		for obj in self.docker.services.list(filters={'name': self.tool.name}) + self.docker.networks.list(names=[f'substrate-{self.tool.name}-net']):  # noqa: E501
-			obj.remove()
+		for obj in self.docker.services.list(filters={'name': self.tool.name}) + self.docker.networks.list(names=[self.network_name]):  # noqa: E501
+			try:
+				obj.remove()
+			except APIError:
+				pass
 		self.log('✓\n')
 
 	def log(self, message):

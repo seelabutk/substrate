@@ -39,8 +39,12 @@ class Braid(Tool):
 
 	def start(self):
 		mounts = super().start()
-
 		docker = from_env()
+
+		network_name = self.config['docker'].get(
+			'network',
+			'substrate-braid-net'
+		)
 
 		mounts.append(
 			Mount('/opt/run', self.braid_path, type='bind', read_only=True)
@@ -62,7 +66,7 @@ class Braid(Tool):
 			),
 			mounts=mounts,
 			name='braid',
-			networks=[f'substrate-{self.name}-net'],
+			networks=[network_name],
 			workdir='/opt/run'
 		)
 

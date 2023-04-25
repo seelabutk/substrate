@@ -26,8 +26,12 @@ class HelloWorld(Tool):
 
 	def start(self):
 		mounts = super().start()
-
 		docker = from_env()
+
+		network_name = self.config['docker'].get(
+			'network',
+			'substrate-hello-net'
+		)
 
 		self.port = self.config['docker'].get('port', self.port)
 		docker.services.create(
@@ -41,5 +45,5 @@ class HelloWorld(Tool):
 			),
 			mounts=mounts,
 			name='hello-world',
-			networks=[f'substrate-{self.name}-net']
+			networks=[network_name]
 		)

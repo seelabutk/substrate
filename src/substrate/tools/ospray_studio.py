@@ -26,8 +26,12 @@ class OSPRayStudio(Tool):
 
 	def start(self):
 		mounts = super().start()
-
 		docker = from_env()
+
+		network_name = self.config['docker'].get(
+			'network',
+			'substrate-ospray-studio-net'
+		)
 
 		self.port = self.config['docker'].get('port', self.port)
 		docker.services.create(
@@ -41,5 +45,5 @@ class OSPRayStudio(Tool):
 			),
 			mounts=mounts,
 			name='ospray-studio',
-			networks=[f'substrate-{self.name}-net']
+			networks=[network_name]
 		)

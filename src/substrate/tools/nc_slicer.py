@@ -27,6 +27,12 @@ class NetCDFSlicer(Tool):
 	def start(self):
 		mounts = super().start()
 		docker = from_env()
+
+		network_name = self.config['docker'].get(
+			'network',
+			'substrate-slicer-net'
+		)
+
 		self.port = self.config['docker'].get('port', self.port)
 		docker.services.create(
 			'seelab/substrate-nc-slicer',
@@ -37,12 +43,11 @@ class NetCDFSlicer(Tool):
 			),
 			mounts=mounts,
 			name='nc-slicer',
-			networks=[f'substrate-{self.name}-net'],
+			networks=[network_name],
 			init=True
 		)
 
-	# TODO: 
+	# TODO:
 	# fix nc-slicer -> nc_slicer and init=True in main substrate repo
 	# set up dockerhub org and move images to it
-	# impliment water-and-land changes to nc_slicer image 
-
+	# impliment water-and-land changes to nc_slicer image

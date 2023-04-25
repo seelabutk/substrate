@@ -33,6 +33,12 @@ class GenericTool(Tool):  # pylint: disable=too-many-instance-attributes
 
 		mounts = super().start()
 		docker = from_env()
+
+		network_name = self.config['docker'].get(
+			'network',
+			f'substrate-{self.name}-net'
+		)
+
 		self.port = self.config['docker'].get('port', self.port)
 		environment_variables = self.config['docker'].get('env', [])
 		arguments = self.config.get('args', [])
@@ -49,6 +55,6 @@ class GenericTool(Tool):  # pylint: disable=too-many-instance-attributes
 			env=environment_variables,
 			mounts=mounts,
 			name=self.name,
-			networks=[f'substrate-{self.name}-net'],
+			networks=[network_name],
 			init=True
 		)

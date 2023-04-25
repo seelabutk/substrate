@@ -40,6 +40,11 @@ class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 		mounts = super().start()
 		docker = from_env()
 
+		network_name = self.config['docker'].get(
+			'network',
+			'substrate-tapestry-net'
+		)
+
 		mounts.append(Mount('/app', self.app_path, type='bind', read_only=True))
 		mounts.append(
 			Mount('/config', self.config_path, type='bind', read_only=True)
@@ -58,7 +63,7 @@ class Tapestry(Tool):  # pylint: disable=too-many-instance-attributes
 			),
 			mounts=mounts,
 			name='tapestry',
-			networks=[f'substrate-{self.name}-net']
+			networks=[network_name]
 		)
 
 	def upload_to_s3(self):
